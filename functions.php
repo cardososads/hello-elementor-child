@@ -60,13 +60,23 @@ function return_acf_introduction_options()
 
     foreach ($intros as $option) {
         $audio_files[] = $option['audio_de_introducao_'];
-        $subtitles[] = json_decode($option['legenda_de_introducao_'], true); // Parsear JSON aqui
+        $legenda = json_decode($option['legenda_de_introducao_'], true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $subtitles[] = $legenda;
+        } else {
+            $subtitles[] = [];
+        }
     }
 
     foreach ($nums_destino as $option) {
         if ($data['destiny_number'] == $option['numero_destino_']) {
             $audio_files[] = $option['audio_destino_'];
-            $subtitles[] = json_decode($option['legenda_destino_'], true); // Parsear JSON aqui
+            $legenda = json_decode($option['legenda_destino_'], true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $subtitles[] = $legenda;
+            } else {
+                $subtitles[] = [];
+            }
         }
     }
 
@@ -126,3 +136,4 @@ function return_acf_introduction_options()
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options');
+
