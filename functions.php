@@ -102,23 +102,39 @@ function return_acf_introduction_options()
             const audioPlayers = document.querySelectorAll('audio');
             const subtitles = <?php echo json_encode($subtitles); ?>;
             const legendaDivs = document.querySelectorAll('.legenda');
+            let currentTimeouts = [];
+
+            function clearAllTimeouts() {
+                currentTimeouts.forEach(timeout => clearTimeout(timeout));
+                currentTimeouts = [];
+            }
 
             function exibirLegendas(index, audio) {
                 const legendasParaAudio = subtitles[index];
                 legendasParaAudio.forEach((legenda) => {
-                    setTimeout(() => {
-                        legendaDivs[index].innerText = legenda.text;
-                        legendaDivs[index].style.display = 'block';
+                    const timeout = setTimeout(() => {
+                        if (!audio.paused) {
+                            legendaDivs[index].innerText = legenda.text;
+                            legendaDivs[index].style.display = 'block';
+                        }
                     }, legenda.time * 1000); // Converter tempo para milissegundos
+                    currentTimeouts.push(timeout);
                 });
             }
 
             audioPlayers.forEach((audio, index) => {
                 audio.addEventListener('play', function() {
+                    clearAllTimeouts();
+                    legendaDivs.forEach(div => div.style.display = 'none');
                     exibirLegendas(index, audio);
                 });
 
+                audio.addEventListener('pause', function() {
+                    clearAllTimeouts();
+                });
+
                 audio.addEventListener('ended', function() {
+                    clearAllTimeouts();
                     audio.style.display = 'none';
                     legendaDivs[index].style.display = 'none';
                     const nextAudio = audioPlayers[index + 1];
