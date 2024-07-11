@@ -60,7 +60,8 @@ function return_acf_introduction_options()
 
     foreach ($intros as $option) {
         $audio_files[] = $option['audio_de_introducao_'];
-        $legenda = json_decode($option['legenda_de_introducao_'], true);
+        $legenda_json = $option['legenda_de_introducao_'];
+        $legenda = json_decode($legenda_json, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             $subtitles[] = $legenda;
         } else {
@@ -71,7 +72,8 @@ function return_acf_introduction_options()
     foreach ($nums_destino as $option) {
         if ($data['destiny_number'] == $option['numero_destino_']) {
             $audio_files[] = $option['audio_destino_'];
-            $legenda = json_decode($option['legenda_destino_'], true);
+            $legenda_json = $option['legenda_destino_'];
+            $legenda = json_decode($legenda_json, true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $subtitles[] = $legenda;
             } else {
@@ -80,10 +82,9 @@ function return_acf_introduction_options()
         }
     }
 
-    // Remover a depuração
-     echo '<pre>';
-     print_r(json_encode($subtitles));
-     echo '</pre>';
+    echo '<pre>';
+    print_r($subtitles);
+    echo '</pre>';
 
     foreach ($audio_files as $index => $audio_src) {
         ?>
@@ -136,4 +137,3 @@ function return_acf_introduction_options()
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options');
-
