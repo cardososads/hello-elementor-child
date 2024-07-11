@@ -52,10 +52,17 @@ function forms_data($form) {
 
 function return_acf_introduction_options()
 {
-    $options = ACFOptions::get_field('acf_intoducoes');
+    $intros = ACFOptions::get_field('acf_intoducoes');
+    $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $data = forms_data('Form1');
     var_dump($data);
-    foreach ($options as $option) {
+    foreach ($intros as $option) {
+        ?>
+        <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
+        <?php
+    }
+    foreach ($nums_destino as $option) {
+        if($data['destiny_number'] === $option['numero_destino_'])
         ?>
         <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
         <?php
