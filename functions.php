@@ -70,7 +70,7 @@ function return_acf_introduction_options()
         }
     }
     echo '<pre>';
-    print_r($subtitles);
+    print_r(json_encode($subtitles));
     echo '</pre>';
 
     foreach ($audio_files as $index => $audio_src) {
