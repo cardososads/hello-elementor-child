@@ -141,6 +141,11 @@ function return_acf_introduction_options()
                     }
                 });
             });
+
+            // Start playing the first audio automatically
+            if (audioPlayers.length > 0) {
+                audioPlayers[0].play();
+            }
         });
     </script>
     <style>
