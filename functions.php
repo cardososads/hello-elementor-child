@@ -6,3 +6,12 @@ function hello_elementor_child_enqueue_styles() {
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
+
+function return_acf_options()
+{
+    $options = ACFOptions::get_field('acf_intoducoes');
+
+    var_dump($options);
+}
+
+add_shortcode('return_options', 'return_acf_options');
