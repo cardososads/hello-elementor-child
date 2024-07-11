@@ -97,13 +97,13 @@ function return_acf_introduction_options($form_name = 'Form1')
         // Verifique o gênero e selecione o áudio e a legenda apropriados
         $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
         $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
-        var_dump($data);
+        var_dump($gender);
+        var_dump($expression_number);
         $audio_file = '';
         $legenda_json = '';
 
         foreach ($nums_expressao as $option) {
             if ($expression_number == $option['numero_expressao_'] && $option['genero_'] == $gender) {
-                var_dump($expression_number);
                 $audio_file = $option['audio_expressao_'];
                 $legenda_json = $option['legenda_expressao_'];
                 break;
