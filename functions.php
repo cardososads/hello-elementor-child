@@ -53,13 +53,17 @@ add_action('init', 'make_form_data_global');
 
 // Função para retornar opções ACF com um player de áudio
 function return_acf_introduction_options() {
+    global $form1_data, $form2_data, $form3_data;
+
+    // Exemplo de uso dos dados do Form1
     if (!empty($form1_data)) {
-        // Faça algo com os dados do Form1
         echo 'Dados do Form1:';
-        var_dump($form1_data);
+        foreach ($form1_data as $key => $value) {
+            echo '<p>' . esc_html($key) . ': ' . esc_html($value) . '</p>';
+        }
     }
 
-    $options = ACFOptions::get_field('acf_intoducoes');
+    $options = ACFOptions::get_field('acf_introducoes');
 
     foreach ($options as $option) {
         ?>
