@@ -62,7 +62,7 @@ function return_acf_introduction_options()
         <?php
     }
     foreach ($nums_destino as $option) {
-        if($data['destiny_number'] === $option['numero_destino_'])
+        if($data['destiny_number'] == $option['numero_destino_'])
         ?>
         <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
         <?php
