@@ -55,21 +55,40 @@ function return_acf_introduction_options()
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $data = forms_data('Form1');
+    $audio_files = [];
+
     foreach ($intros as $option) {
-        ?>
-        <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
-        <?php
+        $audio_files[] = $option['audio_de_introducao_'];
     }
 
     foreach ($nums_destino as $option) {
         if($data['destiny_number'] == $option['numero_destino_']){
-            ?>
-                <audio src="<?= $option['audio_destino_'] ?>" controls></audio>
-            <?php
+            $audio_files[] = $option['audio_destino_'];
         }
     }
 
+    foreach ($audio_files as $index => $audio_src) {
+        ?>
+        <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls></audio>
+        <?php
+    }
+    ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioPlayers = document.querySelectorAll('audio');
+            audioPlayers.forEach((audio, index) => {
+                audio.addEventListener('ended', function() {
+                    const nextAudio = audioPlayers[index + 1];
+                    if (nextAudio) {
+                        nextAudio.play();
+                    }
+                });
+            });
+        });
+    </script>
+    <?php
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options');
+
 
