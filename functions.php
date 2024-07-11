@@ -41,33 +41,30 @@ function process_elementor_form_submission($record, $handler) {
 // Variáveis globais para armazenar os dados dos formulários
 global $form1_data, $form2_data, $form3_data;
 
-// Função para exibir var_dump dos dados dos formulários
-function form_data_var_dump_shortcode() {
+// Função para tornar os dados dos formulários globais
+function make_form_data_global() {
+    global $form1_data, $form2_data, $form3_data;
 
+    $form1_data = get_transient('form1_submission_data');
+    $form2_data = get_transient('form2_submission_data');
+    $form3_data = get_transient('form3_submission_data');
+}
+add_action('init', 'make_form_data_global');
+
+// Função para retornar opções ACF com um player de áudio
+function return_acf_introduction_options() {
     if (!empty($form1_data)) {
         // Faça algo com os dados do Form1
-        var_dump($form1_data);
+        echo 'Dados do Form1:';
+        print_r($form1_data);
     }
 
-    ob_start();
-    echo '<pre>';
-    var_dump($form1_data);
-    echo '</pre>';
-    return ob_get_clean();
-}
-
-add_shortcode('form_data_var_dump', 'form_data_var_dump_shortcode');
-
-function return_acf_introduction_options()
-{
     $options = ACFOptions::get_field('acf_intoducoes');
 
     foreach ($options as $option) {
         ?>
-        <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
+        <audio src="<?= esc_url($option['audio_de_introducao_']); ?>" controls></audio>
         <?php
     }
 }
-
 add_shortcode('return_players', 'return_acf_introduction_options');
-
