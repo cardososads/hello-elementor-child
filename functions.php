@@ -59,11 +59,11 @@ function form_data_var_dump_shortcode($atts) {
     // Capturar a saída do var_dump
     ob_start();
     echo '<pre>';
-    var_dump($data);
+    var_dump($data['destiny_number']);
     echo '</pre>';
     return ob_get_clean();
 }
-
+add_shortcode('form_data_var_dump', 'form_data_var_dump_shortcode');
 
 
 
