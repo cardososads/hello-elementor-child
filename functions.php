@@ -38,34 +38,25 @@ function process_elementor_form_submission($record, $handler) {
     set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
+// Variáveis globais para armazenar os dados dos formulários
+global $form1_data, $form2_data, $form3_data;
+
 // Função para exibir var_dump dos dados dos formulários
-function form_data_var_dump_shortcode($atts) {
-    $atts = shortcode_atts(
-        array(
-            'form' => '', // Parâmetro para identificar qual formulário
-        ),
-        $atts,
-        'form_data_var_dump'
-    );
+function form_data_var_dump_shortcode() {
 
-    // Obter os dados do transient com base no formulário especificado
-    $data = get_transient('form' . $atts['form'] . '_submission_data');
-
-    // Se não houver dados, retorna uma mensagem
-    if (!$data) {
-        return 'No data available.';
+    if (!empty($form1_data)) {
+        // Faça algo com os dados do Form1
+        var_dump($form1_data);
     }
 
-    // Capturar a saída do var_dump
     ob_start();
     echo '<pre>';
-    var_dump($data['destiny_number']);
+    var_dump($form1_data);
     echo '</pre>';
     return ob_get_clean();
 }
+
 add_shortcode('form_data_var_dump', 'form_data_var_dump_shortcode');
-
-
 
 function return_acf_introduction_options()
 {
