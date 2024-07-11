@@ -72,6 +72,7 @@ function return_acf_introduction_options()
     echo '<pre>';
     print_r($subtitles);
     echo '</pre>';
+
     foreach ($audio_files as $index => $audio_src) {
         ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
@@ -82,7 +83,7 @@ function return_acf_introduction_options()
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const audioPlayers = document.querySelectorAll('audio');
-            const subtitles = <?php $subtitles; ?>;
+            const subtitles = <?php echo json_encode($subtitles); ?>;
             const legendaDivs = document.querySelectorAll('.legenda');
 
             function exibirLegendas(index, audio) {
