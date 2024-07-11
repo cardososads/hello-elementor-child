@@ -59,14 +59,16 @@ function return_acf_introduction_options()
         ?>
         <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
         <?php
-        foreach ($nums_destino as $option) {
-            if($data['destiny_number'] == $option['numero_destino_']){
-                ?>
+    }
+
+    foreach ($nums_destino as $option) {
+        if($data['destiny_number'] == $option['numero_destino_']){
+            ?>
                 <audio src="<?= $option['audio_destino_'] ?>" controls></audio>
-                <?php
-            }
+            <?php
         }
     }
+
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options');
