@@ -38,48 +38,30 @@ function process_elementor_form_submission($record, $handler) {
     set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
-// Função para tornar os dados dos formulários globais
-function make_form_data_global() {
-    global $form1_data, $form2_data, $form3_data;
+// Função para exibir var_dump dos dados dos formulários
+function forms_data($form) {
+    // Verifique se o formulário é Form1 ou Form2
+    if (in_array($form, ['Form1', 'Form2'])) {
+        // Obtenha os dados do transient com base no nome do formulário
+        $data = get_transient('form' . $form . '_submission_data');
+        return $data;
+    }
 
-    $form1_data = get_transient('form1_submission_data');
-    $form2_data = get_transient('form2_submission_data');
-    $form3_data = get_transient('form3_submission_data');
+    return null;
 }
-add_action('init', 'make_form_data_global');
 
-// Função para retornar opções ACF com um player de áudio e usar os dados dos formulários
-function return_acf_introduction_options() {
-    global $form1_data, $form2_data, $form3_data;
-
-    // Exemplo de uso dos dados do Form1
-    if (!empty($form1_data)) {
-        echo 'Dados do Form1:';
-        foreach ($form1_data as $key => $value) {
-            echo '<p>' . esc_html($key) . ': ' . esc_html($value) . '</p>';
-        }
-    }
-
-    if (!empty($form2_data)) {
-        echo 'Dados do Form2:';
-        foreach ($form2_data as $key => $value) {
-            echo '<p>' . esc_html($key) . ': ' . esc_html($value) . '</p>';
-        }
-    }
-
-    if (!empty($form3_data)) {
-        echo 'Dados do Form3:';
-        foreach ($form3_data as $key => $value) {
-            echo '<p>' . esc_html($key) . ': ' . esc_html($value) . '</p>';
-        }
-    }
-
-    $options = ACFOptions::get_field('acf_introducoes');
-
+function return_acf_introduction_options()
+{
+    $options = ACFOptions::get_field('acf_intoducoes');
+    $data = forms_data('Form1');
+    var_dump($data);
     foreach ($options as $option) {
         ?>
-        <audio src="<?= esc_url($option['audio_de_introducao_']); ?>" controls></audio>
+        <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
         <?php
     }
+
 }
+
 add_shortcode('return_players', 'return_acf_introduction_options');
+
