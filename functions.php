@@ -60,18 +60,16 @@ function return_acf_introduction_options()
 
     foreach ($intros as $option) {
         $audio_files[] = $option['audio_de_introducao_'];
-        $subtitles[] = $option['legenda_de_introducao_'];
+        $subtitles[] = json_decode($option['legenda_de_introducao_'], true); // Parsear JSON aqui
     }
 
     foreach ($nums_destino as $option) {
-        if($data['destiny_number'] == $option['numero_destino_']){
+        if ($data['destiny_number'] == $option['numero_destino_']) {
             $audio_files[] = $option['audio_destino_'];
-            $subtitles[] = $option['legenda_destino_'];
+            $subtitles[] = json_decode($option['legenda_destino_'], true); // Parsear JSON aqui
         }
     }
-    echo '<pre>';
-    var_dump($subtitles);
-    echo '</pre>';
+
     foreach ($audio_files as $index => $audio_src) {
         ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
@@ -91,7 +89,7 @@ function return_acf_introduction_options()
                     setTimeout(() => {
                         legendaDivs[index].innerText = legenda.text;
                         legendaDivs[index].style.display = 'block';
-                    }, legenda.time * 1000); // Convert time to milliseconds
+                    }, legenda.time * 1000); // Converter tempo para milissegundos
                 });
             }
 
