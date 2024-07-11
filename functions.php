@@ -69,7 +69,9 @@ function return_acf_introduction_options()
             $subtitles[] = $option['legenda_destino_'];
         }
     }
+    echo '<pre>';
     var_dump($subtitles);
+    echo '</pre>';
     foreach ($audio_files as $index => $audio_src) {
         ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
