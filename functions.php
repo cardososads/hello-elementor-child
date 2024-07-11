@@ -60,18 +60,20 @@ function return_acf_introduction_options()
 
     foreach ($intros as $option) {
         $audio_files[] = $option['audio_de_introducao_'];
-        $subtitles[] = $option['legenda_de_introducao_'];
+        $subtitles[] = json_decode($option['legenda_de_introducao_'], true); // Parsear JSON aqui
     }
 
     foreach ($nums_destino as $option) {
         if ($data['destiny_number'] == $option['numero_destino_']) {
             $audio_files[] = $option['audio_destino_'];
-            $subtitles[] = $option['legenda_destino_'];
+            $subtitles[] = json_decode($option['legenda_destino_'], true); // Parsear JSON aqui
         }
     }
-    echo '<pre>';
-    print_r(json_encode($subtitles));
-    echo '</pre>';
+
+    // Remover a depuração
+    // echo '<pre>';
+    // print_r(json_encode($subtitles));
+    // echo '</pre>';
 
     foreach ($audio_files as $index => $audio_src) {
         ?>
