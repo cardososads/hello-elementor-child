@@ -14,7 +14,7 @@ function return_acf_options()
     foreach ($options as $option) {
         ?>
         <audio src="<?= $option['audio_de_introducao_'] ?>" controls>
-        <php
+        <?php
     }
 }
 
