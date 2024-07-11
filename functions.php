@@ -11,7 +11,9 @@ function return_acf_options()
 {
     $options = ACFOptions::get_field('acf_intoducoes');
 
-    var_dump($options);
+    foreach ($options as $option) {
+        var_dump($option);
+    }
 }
 
 add_shortcode('return_options', 'return_acf_options');
