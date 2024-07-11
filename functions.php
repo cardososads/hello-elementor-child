@@ -66,12 +66,6 @@ function return_acf_introduction_options()
         $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
         $legenda = json_decode($legenda_json, true);
 
-        echo '<pre>';
-        echo 'Legenda JSON: ' . $legenda_json . "\n";
-        echo 'Legenda Decodificada: ';
-        print_r($legenda);
-        echo '</pre>';
-
         if (json_last_error() === JSON_ERROR_NONE) {
             $subtitles[] = $legenda;
         } else {
@@ -87,12 +81,6 @@ function return_acf_introduction_options()
             // Correção do JSON: adicionar aspas duplas corretamente
             $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
             $legenda = json_decode($legenda_json, true);
-
-            echo '<pre>';
-            echo 'Legenda JSON: ' . $legenda_json . "\n";
-            echo 'Legenda Decodificada: ';
-            print_r($legenda);
-            echo '</pre>';
 
             if (json_last_error() === JSON_ERROR_NONE) {
                 $subtitles[] = $legenda;
