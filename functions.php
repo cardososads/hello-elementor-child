@@ -69,7 +69,9 @@ function return_acf_introduction_options()
             $subtitles[] = json_decode($option['legenda_destino_'], true); // Parsear JSON aqui
         }
     }
-
+    echo '<pre>';
+    print_r($subtitles);
+    echo '</pre>';
     foreach ($audio_files as $index => $audio_src) {
         ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
