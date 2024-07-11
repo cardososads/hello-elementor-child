@@ -60,13 +60,13 @@ function return_acf_introduction_options()
 
     foreach ($intros as $option) {
         $audio_files[] = $option['audio_de_introducao_'];
-        $subtitles[] = json_decode($option['legenda_de_introducao_'], true); // Parsear JSON aqui
+        $subtitles[] = $option['legenda_de_introducao_'];
     }
 
     foreach ($nums_destino as $option) {
         if ($data['destiny_number'] == $option['numero_destino_']) {
             $audio_files[] = $option['audio_destino_'];
-            $subtitles[] = json_decode($option['legenda_destino_'], true); // Parsear JSON aqui
+            $subtitles[] = $option['legenda_destino_'];
         }
     }
     echo '<pre>';
@@ -82,7 +82,7 @@ function return_acf_introduction_options()
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const audioPlayers = document.querySelectorAll('audio');
-            const subtitles = <?php echo $subtitles; ?>;
+            const subtitles = <?php $subtitles; ?>;
             const legendaDivs = document.querySelectorAll('.legenda');
 
             function exibirLegendas(index, audio) {
