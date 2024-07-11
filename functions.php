@@ -50,60 +50,24 @@ function forms_data($form) {
     return null;
 }
 
-// Função para retornar opções ACF com um player de áudio e usar os dados dos formulários
-// Função para retornar opções ACF com um player de áudio e usar os dados dos formulários
-function return_acf_introduction_options() {
-    $intros = ACFOptions::get_field('acf_introducoes');
+function return_acf_introduction_options()
+{
+    $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $data = forms_data('Form1');
-
-    // Verificar se os dados foram obtidos corretamente
-    if (!$data) {
-        echo 'No data available.';
-        return;
-    }
-
-    $counter = 0;
-
-    // Renderizar players de introdução primeiro
     foreach ($intros as $option) {
-        $counter++;
         ?>
-        <audio id="audio-<?= $counter ?>" src="<?= esc_url($option['audio_de_introducao_']) ?>" controls style="display: <?= $counter === 1 ? 'block' : 'none' ?>;"></audio>
+        <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
         <?php
-    }
-
-    // Renderizar player de número de destino por último
-    foreach ($nums_destino as $option) {
-        if ($data['destiny_number'] == $option['numero_destino_']) {
-            $counter++;
-            ?>
-            <audio id="audio-<?= $counter ?>" src="<?= esc_url($option['audio_destino_']) ?>" controls style="display: none;"></audio>
-            <?php
+        foreach ($nums_destino as $option) {
+            if($data['destiny_number'] == $option['numero_destino_']){
+                ?>
+                <audio src="<?= $option['audio_destino_'] ?>" controls></audio>
+                <?php
+            }
         }
     }
-
-    // Inclui o script para controle dos áudios
-    ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let current = 1;
-            let total = <?= $counter ?>;
-
-            function playNext() {
-                if (current < total) {
-                    document.getElementById('audio-' + current).style.display = 'none';
-                    current++;
-                    document.getElementById('audio-' + current).style.display = 'block';
-                }
-            }
-
-            for (let i = 1; i <= total; i++) {
-                let audioElement = document.getElementById('audio-' + i);
-                audioElement.addEventListener('ended', playNext);
-            }
-        });
-    </script>
-    <?php
 }
+
 add_shortcode('return_players', 'return_acf_introduction_options');
+
