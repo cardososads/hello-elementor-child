@@ -7,7 +7,7 @@ add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
 
-function return_acf_options()
+function return_acf_introduction_options()
 {
     $options = ACFOptions::get_field('acf_intoducoes');
 
@@ -18,4 +18,4 @@ function return_acf_options()
     }
 }
 
-add_shortcode('return_options', 'return_acf_options');
+add_shortcode('return_players', 'return_acf_introduction_options');
