@@ -69,7 +69,7 @@ function return_acf_introduction_options()
 
     foreach ($audio_files as $index => $audio_src) {
         ?>
-        <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls></audio>
+        <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
         <?php
     }
     ?>
@@ -78,8 +78,10 @@ function return_acf_introduction_options()
             const audioPlayers = document.querySelectorAll('audio');
             audioPlayers.forEach((audio, index) => {
                 audio.addEventListener('ended', function() {
+                    audio.style.display = 'none';
                     const nextAudio = audioPlayers[index + 1];
                     if (nextAudio) {
+                        nextAudio.style.display = 'block';
                         nextAudio.play();
                     }
                 });
