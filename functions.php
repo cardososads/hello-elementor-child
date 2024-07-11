@@ -38,9 +38,6 @@ function process_elementor_form_submission($record, $handler) {
     set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
-// Variáveis globais para armazenar os dados dos formulários
-global $form1_data, $form2_data, $form3_data;
-
 // Função para tornar os dados dos formulários globais
 function make_form_data_global() {
     global $form1_data, $form2_data, $form3_data;
@@ -51,46 +48,7 @@ function make_form_data_global() {
 }
 add_action('init', 'make_form_data_global');
 
-// Função para exibir os dados dos formulários e tornar os dados globais
-function form_data_var_dump_shortcode($atts) {
-    global $form1_data, $form2_data, $form3_data;
-
-    $atts = shortcode_atts(
-        array(
-            'form' => '', // Parâmetro para identificar qual formulário
-        ),
-        $atts,
-        'form_data_var_dump'
-    );
-
-    switch ($atts['form']) {
-        case '1':
-            $data = $form1_data;
-            break;
-        case '2':
-            $data = $form2_data;
-            break;
-        case '3':
-            $data = $form3_data;
-            break;
-        default:
-            return 'No data available.';
-    }
-
-    if (!$data) {
-        return 'No data available.';
-    }
-
-    // Capturar a saída do var_dump
-    ob_start();
-    echo '<pre>';
-    var_dump($data['destiny_number'] ?? $data);
-    echo '</pre>';
-    return ob_get_clean();
-}
-add_shortcode('form_data_var_dump', 'form_data_var_dump_shortcode');
-
-// Função para retornar opções ACF com um player de áudio
+// Função para retornar opções ACF com um player de áudio e usar os dados dos formulários
 function return_acf_introduction_options() {
     global $form1_data, $form2_data, $form3_data;
 
@@ -98,6 +56,20 @@ function return_acf_introduction_options() {
     if (!empty($form1_data)) {
         echo 'Dados do Form1:';
         foreach ($form1_data as $key => $value) {
+            echo '<p>' . esc_html($key) . ': ' . esc_html($value) . '</p>';
+        }
+    }
+
+    if (!empty($form2_data)) {
+        echo 'Dados do Form2:';
+        foreach ($form2_data as $key => $value) {
+            echo '<p>' . esc_html($key) . ': ' . esc_html($value) . '</p>';
+        }
+    }
+
+    if (!empty($form3_data)) {
+        echo 'Dados do Form3:';
+        foreach ($form3_data as $key => $value) {
             echo '<p>' . esc_html($key) . ': ' . esc_html($value) . '</p>';
         }
     }
