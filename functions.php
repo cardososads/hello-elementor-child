@@ -12,7 +12,9 @@ function return_acf_options()
     $options = ACFOptions::get_field('acf_intoducoes');
 
     foreach ($options as $option) {
+        echo '<pre>';
         var_dump($option);
+        echo '</pre>';
     }
 }
 
