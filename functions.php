@@ -56,7 +56,7 @@ function return_acf_introduction_options() {
     if (!empty($form1_data)) {
         // Faça algo com os dados do Form1
         echo 'Dados do Form1:';
-        print_r($form1_data);
+        var_dump($form1_data);
     }
 
     $options = ACFOptions::get_field('acf_intoducoes');
