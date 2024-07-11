@@ -82,7 +82,7 @@ function return_acf_introduction_options()
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const audioPlayers = document.querySelectorAll('audio');
-            const subtitles = <?php echo json_encode($subtitles); ?>;
+            const subtitles = <?php echo $subtitles; ?>;
             const legendaDivs = document.querySelectorAll('.legenda');
 
             function exibirLegendas(index, audio) {
