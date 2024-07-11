@@ -13,7 +13,7 @@ function return_acf_introduction_options()
 
     foreach ($options as $option) {
         ?>
-        <audio src="<?= $option['audio_de_introducao_'] ?>" controls>
+        <audio src="<?= $option['audio_de_introducao_'] ?>" controls></audio>
         <?php
     }
 }
