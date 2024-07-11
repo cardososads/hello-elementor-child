@@ -56,6 +56,7 @@ function return_acf_introduction_options($form_name = 'Form1')
 {
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
+    $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
     $data = forms_data($form_name); // Use o nome do formulário passado como parâmetro
     $audio_files = [];
     $subtitles = [];
@@ -93,9 +94,22 @@ function return_acf_introduction_options($form_name = 'Form1')
             }
         }
     } else if ($form_name === 'Form2') {
-        // Assumindo que existe apenas um áudio e uma legenda para Form2
-        $audio_files[] = $data['audio'];
-        $legenda_json = $data['legenda'];
+        // Verifique o gênero e selecione o áudio e a legenda apropriados
+        $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
+        $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
+
+        $audio_file = '';
+        $legenda_json = '';
+
+        foreach ($nums_expressao as $option) {
+            if ($expression_number == $option['numero_expressao_'] && $option['genero_'] == $gender) {
+                $audio_file = $option['audio_expressao_'];
+                $legenda_json = $option['legenda_expressao_'];
+                break;
+            }
+        }
+
+        $audio_files[] = $audio_file;
 
         // Correção do JSON: adicionar aspas duplas corretamente
         $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
