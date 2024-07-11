@@ -51,12 +51,21 @@ function forms_data($form) {
 }
 
 // Função para retornar opções ACF com um player de áudio e usar os dados dos formulários
+// Função para retornar opções ACF com um player de áudio e usar os dados dos formulários
 function return_acf_introduction_options() {
-    $intros = ACFOptions::get_field('acf_intoducoes');
+    $intros = ACFOptions::get_field('acf_introducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $data = forms_data('Form1');
+
+    // Verificar se os dados foram obtidos corretamente
+    if (!$data) {
+        echo 'No data available.';
+        return;
+    }
+
     $counter = 0;
 
+    // Renderizar players de introdução primeiro
     foreach ($intros as $option) {
         $counter++;
         ?>
@@ -64,6 +73,7 @@ function return_acf_introduction_options() {
         <?php
     }
 
+    // Renderizar player de número de destino por último
     foreach ($nums_destino as $option) {
         if ($data['destiny_number'] == $option['numero_destino_']) {
             $counter++;
@@ -97,4 +107,3 @@ function return_acf_introduction_options() {
     <?php
 }
 add_shortcode('return_players', 'return_acf_introduction_options');
-
