@@ -38,6 +38,34 @@ function process_elementor_form_submission($record, $handler) {
     set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
+// Função para exibir var_dump dos dados dos formulários
+function form_data_var_dump_shortcode($atts) {
+    $atts = shortcode_atts(
+        array(
+            'form' => '', // Parâmetro para identificar qual formulário
+        ),
+        $atts,
+        'form_data_var_dump'
+    );
+
+    // Obter os dados do transient com base no formulário especificado
+    $data = get_transient('form' . $atts['form'] . '_submission_data');
+
+    // Se não houver dados, retorna uma mensagem
+    if (!$data) {
+        return 'No data available.';
+    }
+
+    // Capturar a saída do var_dump
+    ob_start();
+    echo '<pre>';
+    var_dump($data);
+    echo '</pre>';
+    return ob_get_clean();
+}
+add_shortcode('form_data_var_dump', 'form_data_var_dump_shortcode');
+
+
 
 function return_acf_introduction_options()
 {
