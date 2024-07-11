@@ -12,6 +12,8 @@ require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
+add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
+
 function process_elementor_form_submission($record, $handler) {
     // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
@@ -38,10 +40,10 @@ function process_elementor_form_submission($record, $handler) {
     set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
-// Função para exibir var_dump dos dados dos formulários
+// Função para obter os dados dos formulários
 function forms_data($form) {
-    // Verifique se o formulário é Form1 ou Form2
-    if (in_array($form, ['Form1', 'Form2'])) {
+    // Verifique se o formulário é Form1, Form2 ou Form3
+    if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
         // Obtenha os dados do transient com base no nome do formulário
         $data = get_transient('form' . $form . '_submission_data');
         return $data;
@@ -50,33 +52,18 @@ function forms_data($form) {
     return null;
 }
 
-function return_acf_introduction_options()
+function return_acf_introduction_options($form_name = 'Form1')
 {
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
-    $data = forms_data('Form1');
+    $data = forms_data($form_name); // Use o nome do formulário passado como parâmetro
     $audio_files = [];
     $subtitles = [];
 
-    foreach ($intros as $option) {
-        $audio_files[] = $option['audio_de_introducao_'];
-        $legenda_json = $option['legenda_de_introducao_'];
-
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
-
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
-        }
-    }
-
-    foreach ($nums_destino as $option) {
-        if ($data['destiny_number'] == $option['numero_destino_']) {
-            $audio_files[] = $option['audio_destino_'];
-            $legenda_json = $option['legenda_destino_'];
+    if ($form_name === 'Form1') {
+        foreach ($intros as $option) {
+            $audio_files[] = $option['audio_de_introducao_'];
+            $legenda_json = $option['legenda_de_introducao_'];
 
             // Correção do JSON: adicionar aspas duplas corretamente
             $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
@@ -87,6 +74,51 @@ function return_acf_introduction_options()
             } else {
                 $subtitles[] = [];
             }
+        }
+
+        foreach ($nums_destino as $option) {
+            if ($data['destiny_number'] == $option['numero_destino_']) {
+                $audio_files[] = $option['audio_destino_'];
+                $legenda_json = $option['legenda_destino_'];
+
+                // Correção do JSON: adicionar aspas duplas corretamente
+                $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+                $legenda = json_decode($legenda_json, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $subtitles[] = $legenda;
+                } else {
+                    $subtitles[] = [];
+                }
+            }
+        }
+    } else if ($form_name === 'Form2') {
+        // Assumindo que existe apenas um áudio e uma legenda para Form2
+        $audio_files[] = $data['audio'];
+        $legenda_json = $data['legenda'];
+
+        // Correção do JSON: adicionar aspas duplas corretamente
+        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+        $legenda = json_decode($legenda_json, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $subtitles[] = $legenda;
+        } else {
+            $subtitles[] = [];
+        }
+    } else if ($form_name === 'Form3') {
+        // Assumindo que existe apenas um áudio e uma legenda para Form3
+        $audio_files[] = $data['audio'];
+        $legenda_json = $data['legenda'];
+
+        // Correção do JSON: adicionar aspas duplas corretamente
+        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+        $legenda = json_decode($legenda_json, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $subtitles[] = $legenda;
+        } else {
+            $subtitles[] = [];
         }
     }
 
@@ -158,4 +190,15 @@ function return_acf_introduction_options()
     <?php
 }
 
-add_shortcode('return_players', 'return_acf_introduction_options');
+function return_acf_introduction_options_shortcode($atts)
+{
+    $atts = shortcode_atts(array(
+        'form' => 'Form1',
+    ), $atts, 'return_players');
+
+    ob_start();
+    return_acf_introduction_options($atts['form']);
+    return ob_get_clean();
+}
+
+add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
