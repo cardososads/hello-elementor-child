@@ -61,15 +61,17 @@ function return_acf_introduction_options()
     foreach ($intros as $option) {
         $audio_files[] = $option['audio_de_introducao_'];
         $legenda_json = $option['legenda_de_introducao_'];
-        // Corrigir a formatação do JSON, se necessário
-        $legenda_json = str_replace("'", '"', $legenda_json);
-        $legenda_json = preg_replace('/\s+/', ' ', $legenda_json);
+
+        // Correção do JSON: adicionar aspas duplas corretamente
+        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+        $legenda = json_decode($legenda_json, true);
+
         echo '<pre>';
         echo 'Legenda JSON: ' . $legenda_json . "\n";
-        $legenda = json_decode($legenda_json, true);
         echo 'Legenda Decodificada: ';
         print_r($legenda);
         echo '</pre>';
+
         if (json_last_error() === JSON_ERROR_NONE) {
             $subtitles[] = $legenda;
         } else {
@@ -81,15 +83,17 @@ function return_acf_introduction_options()
         if ($data['destiny_number'] == $option['numero_destino_']) {
             $audio_files[] = $option['audio_destino_'];
             $legenda_json = $option['legenda_destino_'];
-            // Corrigir a formatação do JSON, se necessário
-            $legenda_json = str_replace("'", '"', $legenda_json);
-            $legenda_json = preg_replace('/\s+/', ' ', $legenda_json);
+
+            // Correção do JSON: adicionar aspas duplas corretamente
+            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda = json_decode($legenda_json, true);
+
             echo '<pre>';
             echo 'Legenda JSON: ' . $legenda_json . "\n";
-            $legenda = json_decode($legenda_json, true);
             echo 'Legenda Decodificada: ';
             print_r($legenda);
             echo '</pre>';
+
             if (json_last_error() === JSON_ERROR_NONE) {
                 $subtitles[] = $legenda;
             } else {
@@ -97,11 +101,6 @@ function return_acf_introduction_options()
             }
         }
     }
-
-    // Remover a depuração
-    // echo '<pre>';
-    // print_r(json_encode($subtitles));
-    // echo '</pre>';
 
     foreach ($audio_files as $index => $audio_src) {
         ?>
@@ -154,4 +153,3 @@ function return_acf_introduction_options()
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options');
-
