@@ -61,7 +61,12 @@ function return_acf_introduction_options()
     foreach ($intros as $option) {
         $audio_files[] = $option['audio_de_introducao_'];
         $legenda_json = $option['legenda_de_introducao_'];
+        echo '<pre>';
+        echo 'Legenda JSON: ' . $legenda_json . "\n";
         $legenda = json_decode($legenda_json, true);
+        echo 'Legenda Decodificada: ';
+        print_r($legenda);
+        echo '</pre>';
         if (json_last_error() === JSON_ERROR_NONE) {
             $subtitles[] = $legenda;
         } else {
@@ -73,7 +78,12 @@ function return_acf_introduction_options()
         if ($data['destiny_number'] == $option['numero_destino_']) {
             $audio_files[] = $option['audio_destino_'];
             $legenda_json = $option['legenda_destino_'];
+            echo '<pre>';
+            echo 'Legenda JSON: ' . $legenda_json . "\n";
             $legenda = json_decode($legenda_json, true);
+            echo 'Legenda Decodificada: ';
+            print_r($legenda);
+            echo '</pre>';
             if (json_last_error() === JSON_ERROR_NONE) {
                 $subtitles[] = $legenda;
             } else {
@@ -82,9 +92,10 @@ function return_acf_introduction_options()
         }
     }
 
-    echo '<pre>';
-    print_r($subtitles);
-    echo '</pre>';
+    // Remover a depuração
+    // echo '<pre>';
+    // print_r(json_encode($subtitles));
+    // echo '</pre>';
 
     foreach ($audio_files as $index => $audio_src) {
         ?>
