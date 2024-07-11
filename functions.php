@@ -6,6 +6,8 @@ function hello_elementor_child_enqueue_styles() {
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
+require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
+require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 
 
 // Hook para processar o envio dos formulários
@@ -21,7 +23,7 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
     }
 
     // Instancia a classe de cálculo
-    require_once get_stylesheet_directory() . '/class-numerology-calculator.php';
+    require_once get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
     $calculator = new NumerologyCalculator();
 
     // Armazena os dados do formulário usando transients para acesso global
@@ -44,8 +46,11 @@ add_action('elementor_pro/forms/new_record', function ($record, $handler) {
 
 }, 10, 2);
 
-// Função para exibir dados dos transients
-function display_form_data_shortcode($atts) {
+// Classe para recuperar dados dos formulários
+require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
+
+// Função para exibir dados dos formulários
+function form_data_shortcode($atts) {
     $atts = shortcode_atts(
         array(
             'form' => '', // Parâmetro para identificar qual formulário
@@ -54,24 +59,10 @@ function display_form_data_shortcode($atts) {
         'form_data'
     );
 
-    // Obter os dados do transient com base no formulário especificado
-    $data = get_transient('form' . $atts['form'] . '_submission_data');
-
-    // Se não houver dados, retorna uma mensagem
-    if (!$data) {
-        return 'No data available.';
-    }
-
-    // Montar a saída HTML
-    $output = '<div class="form-data">';
-    foreach ($data as $key => $value) {
-        $output .= '<p><strong>' . esc_html($key) . ':</strong> ' . esc_html($value) . '</p>';
-    }
-    $output .= '</div>';
-
-    return $output;
+    return FormDataRetriever::display_form_data($atts['form']);
 }
-add_shortcode('form_data', 'display_form_data_shortcode');
+add_shortcode('form_data', 'form_data_shortcode');
+
 
 
 function return_acf_introduction_options()
@@ -86,3 +77,4 @@ function return_acf_introduction_options()
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options');
+
