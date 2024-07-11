@@ -56,29 +56,51 @@ function return_acf_introduction_options()
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $data = forms_data('Form1');
     $audio_files = [];
+    $subtitles = [];
 
     foreach ($intros as $option) {
         $audio_files[] = $option['audio_de_introducao_'];
+        $subtitles[] = $option['legenda_de_introducao_'];
     }
 
     foreach ($nums_destino as $option) {
         if($data['destiny_number'] == $option['numero_destino_']){
             $audio_files[] = $option['audio_destino_'];
+            $subtitles[] = $option['legenda_destino_'];
         }
     }
-
+    var_dump($subtitles);
     foreach ($audio_files as $index => $audio_src) {
         ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
+        <div id="legenda_<?= $index ?>" class="legenda" style="display: none;"></div>
         <?php
     }
     ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const audioPlayers = document.querySelectorAll('audio');
+            const subtitles = <?php echo json_encode($subtitles); ?>;
+            const legendaDivs = document.querySelectorAll('.legenda');
+
+            function exibirLegendas(index, audio) {
+                const legendasParaAudio = subtitles[index];
+                legendasParaAudio.forEach((legenda) => {
+                    setTimeout(() => {
+                        legendaDivs[index].innerText = legenda.text;
+                        legendaDivs[index].style.display = 'block';
+                    }, legenda.time * 1000); // Convert time to milliseconds
+                });
+            }
+
             audioPlayers.forEach((audio, index) => {
+                audio.addEventListener('play', function() {
+                    exibirLegendas(index, audio);
+                });
+
                 audio.addEventListener('ended', function() {
                     audio.style.display = 'none';
+                    legendaDivs[index].style.display = 'none';
                     const nextAudio = audioPlayers[index + 1];
                     if (nextAudio) {
                         nextAudio.style.display = 'block';
@@ -88,9 +110,14 @@ function return_acf_introduction_options()
             });
         });
     </script>
+    <style>
+        .legenda {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
     <?php
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options');
-
-
