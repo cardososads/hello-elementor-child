@@ -71,9 +71,9 @@ function return_acf_introduction_options()
     }
 
     // Remover a depuração
-    // echo '<pre>';
-    // print_r(json_encode($subtitles));
-    // echo '</pre>';
+     echo '<pre>';
+     print_r(json_encode($subtitles));
+     echo '</pre>';
 
     foreach ($audio_files as $index => $audio_src) {
         ?>
