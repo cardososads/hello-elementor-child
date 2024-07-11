@@ -38,9 +38,6 @@ function process_elementor_form_submission($record, $handler) {
     set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
-// Variáveis globais para armazenar os dados dos formulários
-global $form1_data, $form2_data, $form3_data;
-
 // Função para exibir var_dump dos dados dos formulários
 function form_data_var_dump_shortcode($atts) {
     $atts = shortcode_atts(
