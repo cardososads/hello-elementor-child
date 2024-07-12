@@ -81,7 +81,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         }
 
         foreach ($nums_destino as $option) {
-            if ($data['destiny_number'] == $option['numero_destino_']) {
+            if (isset($data['destiny_number']) && $data['destiny_number'] == $option['numero_destino_']) {
                 $audio_files[] = $option['audio_destino_'];
                 $legenda_json = $option['legenda_destino_'];
 
@@ -98,8 +98,8 @@ function return_acf_introduction_options($form_name = 'Form1')
         }
     } else if ($form_name === 'Form2') {
         // Verifique o gênero e selecione o áudio e a legenda apropriados
-        $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
-        $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
+        $gender = isset($data['gender']) ? $data['gender'] : ''; // Supondo que 'gender' está disponível nos dados do formulário
+        $expression_number = isset($data['expression_number']) ? $data['expression_number'] : ''; // Supondo que 'expression_number' está disponível nos dados do formulário
 
         $audio_file = '';
         $legenda_json = '';
@@ -108,35 +108,38 @@ function return_acf_introduction_options($form_name = 'Form1')
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_file = $option['audio_expressao_'];
                 $legenda_json = $option['legenda_expressao_'];
-                var_dump($legenda_json);
                 break;
             }
         }
 
-        $audio_files[] = $audio_file;
+        if ($audio_file) {
+            $audio_files[] = $audio_file;
 
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
+            // Correção do JSON: adicionar aspas duplas corretamente
+            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda = json_decode($legenda_json, true);
 
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $subtitles[] = $legenda;
+            } else {
+                $subtitles[] = [];
+            }
         }
     } else if ($form_name === 'Form3') {
         // Assumindo que existe apenas um áudio e uma legenda para Form3
-        $audio_files[] = $data['audio'];
-        $legenda_json = $data['legenda'];
+        if (isset($data['audio'])) {
+            $audio_files[] = $data['audio'];
+            $legenda_json = $data['legenda'];
 
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
+            // Correção do JSON: adicionar aspas duplas corretamente
+            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda = json_decode($legenda_json, true);
 
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $subtitles[] = $legenda;
+            } else {
+                $subtitles[] = [];
+            }
         }
     }
 
