@@ -71,6 +71,7 @@ function forms_data($form) {
 }
 
 function return_acf_introduction_options($form_name = 'Form1') {
+    global $form_submission_data;
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
@@ -89,7 +90,8 @@ function return_acf_introduction_options($form_name = 'Form1') {
             $audio_files[] = $option['audio_de_introducao_'];
             $legenda_json = fix_json($option['legenda_de_introducao_']);
             $legenda = json_decode($legenda_json, true);
-
+            global $form_submission_data;
+            var_dump($form_submission_data);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $subtitles[] = $legenda;
             } else {
