@@ -187,6 +187,8 @@ function return_acf_introduction_options($form_name = 'Form1') {
                     if (nextAudio) {
                         nextAudio.style.display = 'block';
                         nextAudio.play();
+                    } else {
+                        console.log('No more audio players to play.');
                     }
                 });
             });
