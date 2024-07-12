@@ -107,7 +107,8 @@ function return_acf_introduction_options($form_name = 'Form1') {
     } else if ($form_name === 'Form2') {
         $gender = $data['gender'];
         $expression_number = $data['expression_number'];
-        var_dump($data);
+        $motivation_number = $data['motivation_number'];
+        var_dump($motivation_number);
         $audio_file = '';
         $legenda_json = '';
 
