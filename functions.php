@@ -12,8 +12,6 @@ require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
-add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
-
 function process_elementor_form_submission($record, $handler) {
     // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
