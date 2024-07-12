@@ -116,7 +116,8 @@ function return_acf_introduction_options($form_name = 'Form1') {
         // Verifique o gênero e selecione o áudio e a legenda apropriados
         $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
         $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
-
+        global $form_submission_data;
+        var_dump($form_submission_data);
         $audio_file = '';
         $legenda_json = '';
 
@@ -141,7 +142,8 @@ function return_acf_introduction_options($form_name = 'Form1') {
         $audio_files[] = $data['audio'];
         $legenda_json = fix_json($data['legenda']);
         $legenda = json_decode($legenda_json, true);
-
+        global $form_submission_data;
+        var_dump($form_submission_data);
         if (json_last_error() === JSON_ERROR_NONE) {
             $subtitles[] = $legenda;
         } else {
