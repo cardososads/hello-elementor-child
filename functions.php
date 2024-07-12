@@ -11,6 +11,7 @@ require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
+x
 function process_elementor_form_submission($record, $handler) {
     $form_name = $record->get_form_settings('form_name');
     $fields = array_map(function($field) {
@@ -32,14 +33,10 @@ function process_elementor_form_submission($record, $handler) {
             }
             break;
         case 'Form3':
-            if (isset($fields['full_name'])) {
-                $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
-            } else {
-                // Tentar recuperar o valor de Form2
-                $form2_data = get_transient('formForm2_submission_data');
-                if (isset($form2_data['motivation_number'])) {
-                    $fields['motivation_number'] = $form2_data['motivation_number'];
-                }
+            // Tentar recuperar o valor de Form2
+            $form2_data = get_transient('formForm2_submission_data');
+            if (isset($form2_data['motivation_number'])) {
+                $fields['motivation_number'] = $form2_data['motivation_number'];
             }
             break;
     }
@@ -120,7 +117,7 @@ function return_acf_introduction_options($form_name = 'Form1') {
     } else if ($form_name === 'Form3') {
         $motivation_number = $data['motivation_number'];
         $gender = $data['gender'];
-        $estado_civil = $data['marital_status']; // Atualizado para pegar o ID correto
+        $estado_civil = $data['marital_status'];
 
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['genero_motivacao_'] == $gender && $option['estado_civil_motivacao_'] == $estado_civil) {
