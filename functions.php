@@ -38,6 +38,9 @@ function process_elementor_form_submission($record, $handler) {
             if (isset($form2_data['motivation_number'])) {
                 $fields['motivation_number'] = $form2_data['motivation_number'];
             }
+            if (isset($form2_data['gender'])) {
+                $fields['gender'] = $form2_data['gender'];
+            }
             break;
     }
 
@@ -59,6 +62,15 @@ function return_acf_introduction_options($form_name = 'Form1') {
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
     $nums_motivacao = ACFOptions::get_field('acf_numeros_de_motivacao');
     $data = forms_data($form_name);
+
+    // Se estamos no Form3, também buscar os dados do Form2
+    if ($form_name === 'Form3') {
+        $form2_data = forms_data('Form2');
+        if ($form2_data) {
+            $data = array_merge($form2_data, $data);
+        }
+    }
+
     $audio_files = [];
     $subtitles = [];
 
@@ -118,7 +130,9 @@ function return_acf_introduction_options($form_name = 'Form1') {
         $motivation_number = $data['motivation_number'];
         $gender = $data['gender'];
         $estado_civil = $data['marital_status'];
-
+        var_dump($motivation_number);
+        var_dump($gender);
+        var_dump($estado_civil);
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['genero_motivacao_'] == $gender && $option['estado_civil_motivacao_'] == $estado_civil) {
                 $audio_files[] = $option['audio_motivacao_'];
