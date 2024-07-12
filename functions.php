@@ -12,8 +12,6 @@ require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
-add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
-
 function process_elementor_form_submission($record, $handler) {
     $form_name = $record->get_form_settings('form_name');
     $fields = array_map(function($field) {
@@ -24,14 +22,20 @@ function process_elementor_form_submission($record, $handler) {
 
     switch ($form_name) {
         case 'Form1':
-            $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
+            if (isset($fields['birth_date'])) {
+                $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
+            }
             break;
         case 'Form2':
-            $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
-            $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
+            if (isset($fields['full_name'])) {
+                $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
+                $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
+            }
             break;
         case 'Form3':
-            $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
+            if (isset($fields['full_name'])) {
+                $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
+            }
             break;
     }
 
@@ -40,18 +44,14 @@ function process_elementor_form_submission($record, $handler) {
 
 // Função para obter os dados dos formulários
 function forms_data($form) {
-    // Verifique se o formulário é Form1, Form2 ou Form3
     if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
-        // Obtenha os dados do transient com base no nome do formulário
         $data = get_transient('form' . $form . '_submission_data');
         return $data;
     }
-
     return null;
 }
 
-function return_acf_introduction_options($form_name = 'Form1')
-{
+function return_acf_introduction_options($form_name = 'Form1') {
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
@@ -116,7 +116,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         $motivation_number = $data['motivation_number'];
         $gender = $data['gender'];
         $estado_civil = $data['marital_status']; // Atualizado para pegar o ID correto
-        var_dump($data);
+
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['genero_motivacao_'] == $gender && $option['estado_civil_motivacao_'] == $estado_civil) {
                 $audio_files[] = $option['audio_motivacao_'];
@@ -199,8 +199,8 @@ function return_acf_introduction_options($form_name = 'Form1')
     </style>
     <?php
 }
-function return_acf_introduction_options_shortcode($atts)
-{
+
+function return_acf_introduction_options_shortcode($atts) {
     $atts = shortcode_atts(array(
         'form' => 'Form1',
     ), $atts, 'return_players');
