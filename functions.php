@@ -1,5 +1,4 @@
 <?php
-
 function hello_elementor_child_enqueue_styles() {
     wp_enqueue_style('hello-elementor-style', get_template_directory_uri() . '/style.css');
     wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'));
@@ -11,6 +10,8 @@ require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
 require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 
 // Hook para processar o envio dos formulários
+add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
+
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
 function process_elementor_form_submission($record, $handler) {
@@ -104,6 +105,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_file = $option['audio_expressao_'];
                 $legenda_json = $option['legenda_expressao_'];
+                var_dump($legenda_json);
                 break;
             }
         }
@@ -111,7 +113,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         $audio_files[] = $audio_file;
 
         // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = str_replace("'", '"', $legenda_json);
+        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
         $legenda = json_decode($legenda_json, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
@@ -125,7 +127,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         $legenda_json = $data['legenda'];
 
         // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = str_replace("'", '"', $legenda_json);
+        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
         $legenda = json_decode($legenda_json, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
