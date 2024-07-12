@@ -11,11 +11,13 @@ require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
+
 function process_elementor_form_submission($record, $handler) {
     $form_name = $record->get_form_settings('form_name');
-    $fields = array_map(function($field) {
-        return $field['value'];
-    }, $record->get('fields'));
+    $fields = [];
+    foreach ($record->get('fields') as $field) {
+        $fields[$field['name']] = $field['value'];
+    }
 
     $calculator = new NumerologyCalculator();
 
@@ -32,13 +34,13 @@ function process_elementor_form_submission($record, $handler) {
             }
             break;
         case 'Form3':
-            if (isset($fields['full_name'])) {
-                $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
-            } else {
-                // Tentar recuperar o valor de Form2
-                $form2_data = get_transient('formForm2_submission_data');
+            $form2_data = get_transient('formForm2_submission_data');
+            if ($form2_data) {
                 if (isset($form2_data['motivation_number'])) {
                     $fields['motivation_number'] = $form2_data['motivation_number'];
+                }
+                if (isset($form2_data['gender'])) {
+                    $fields['gender'] = $form2_data['gender'];
                 }
             }
             break;
@@ -62,27 +64,22 @@ function return_acf_introduction_options($form_name = 'Form1') {
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
     $nums_motivacao = ACFOptions::get_field('acf_numeros_de_motivacao');
     $data = forms_data($form_name);
+
+    if ($form_name === 'Form3') {
+        $form2_data = forms_data('Form2');
+        if ($form2_data) {
+            $data = array_merge($form2_data, $data);
+        }
+    }
+
     $audio_files = [];
     $subtitles = [];
 
     if ($form_name === 'Form1') {
-        foreach ($intros as $option) {
-            $audio_files[] = $option['audio_de_introducao_'];
-            $legenda_json = $option['legenda_de_introducao_'];
-            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-            $legenda = json_decode($legenda_json, true);
-
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $subtitles[] = $legenda;
-            } else {
-                $subtitles[] = [];
-            }
-        }
-
-        foreach ($nums_destino as $option) {
-            if ($data['destiny_number'] == $option['numero_destino_']) {
-                $audio_files[] = $option['audio_destino_'];
-                $legenda_json = $option['legenda_destino_'];
+        if ($intros) {
+            foreach ($intros as $option) {
+                $audio_files[] = $option['audio_de_introducao_'];
+                $legenda_json = $option['legenda_de_introducao_'];
                 $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
                 $legenda = json_decode($legenda_json, true);
 
@@ -93,46 +90,66 @@ function return_acf_introduction_options($form_name = 'Form1') {
                 }
             }
         }
-    } else if ($form_name === 'Form2') {
-        $gender = $data['gender'];
-        $expression_number = $data['expression_number'];
 
-        $audio_file = '';
-        $legenda_json = '';
+        if ($nums_destino && isset($data['destiny_number'])) {
+            foreach ($nums_destino as $option) {
+                if ($data['destiny_number'] == $option['numero_destino_']) {
+                    $audio_files[] = $option['audio_destino_'];
+                    $legenda_json = $option['legenda_destino_'];
+                    $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+                    $legenda = json_decode($legenda_json, true);
 
-        foreach ($nums_expressao as $option) {
-            if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
-                $audio_file = $option['audio_expressao_'];
-                $legenda_json = $option['legenda_expressao_'];
-                break;
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $subtitles[] = $legenda;
+                    } else {
+                        $subtitles[] = [];
+                    }
+                }
             }
         }
+    } elseif ($form_name === 'Form2') {
+        if (isset($data['gender'], $data['expression_number']) && $nums_expressao) {
+            $gender = $data['gender'];
+            $expression_number = $data['expression_number'];
+            $audio_file = '';
+            $legenda_json = '';
 
-        $audio_files[] = $audio_file;
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
+            foreach ($nums_expressao as $option) {
+                if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
+                    $audio_file = $option['audio_expressao_'];
+                    $legenda_json = $option['legenda_expressao_'];
+                    break;
+                }
+            }
 
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
+            $audio_files[] = $audio_file;
+            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda = json_decode($legenda_json, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $subtitles[] = $legenda;
+            } else {
+                $subtitles[] = [];
+            }
         }
-    } else if ($form_name === 'Form3') {
-        $motivation_number = $data['motivation_number'];
-        $gender = $data['gender'];
-        $estado_civil = $data['marital_status']; // Atualizado para pegar o ID correto
+    } elseif ($form_name === 'Form3') {
+        $motivation_number = isset($data['motivation_number']) ? $data['motivation_number'] : null;
+        $gender = isset($data['gender']) ? $data['gender'] : null;
+        $estado_civil = isset($data['marital_status']) ? $data['marital_status'] : null;
 
-        foreach ($nums_motivacao as $option) {
-            if ($motivation_number == $option['numero_motivacao_'] && $option['genero_motivacao_'] == $gender && $option['estado_civil_motivacao_'] == $estado_civil) {
-                $audio_files[] = $option['audio_motivacao_'];
-                $legenda_json = $option['legenda_motivacao_'];
-                $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-                $legenda = json_decode($legenda_json, true);
+        if ($nums_motivacao) {
+            foreach ($nums_motivacao as $option) {
+                if ($motivation_number == $option['numero_motivacao_'] && $option['genero_motivacao_'] == $gender && $option['estado_civil_motivacao_'] == $estado_civil) {
+                    $audio_files[] = $option['audio_motivacao_'];
+                    $legenda_json = $option['legenda_motivacao_'];
+                    $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+                    $legenda = json_decode($legenda_json, true);
 
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $subtitles[] = $legenda;
-                } else {
-                    $subtitles[] = [];
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $subtitles[] = $legenda;
+                    } else {
+                        $subtitles[] = [];
+                    }
                 }
             }
         }
@@ -181,7 +198,7 @@ function return_acf_introduction_options($form_name = 'Form1') {
 
                 audio.addEventListener('ended', function() {
                     audio.style.display = 'none';
-                    legendaDivs[index].style.display = 'none';
+                    legendaDivs[index].style.display = 'none');
                     const nextAudio = audioPlayers[index + 1];
                     if (nextAudio) {
                         nextAudio.style.display = 'block';
@@ -216,3 +233,5 @@ function return_acf_introduction_options_shortcode($atts) {
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
+
+//
