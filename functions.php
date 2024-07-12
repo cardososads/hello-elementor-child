@@ -182,10 +182,10 @@ function return_acf_introduction_options($form_name = 'Form1')
                 });
 
                 audio.addEventListener('ended', function() {
-                    audio.style.display = 'none';
                     legendaDivs[index].style.display = 'none';
                     const nextAudio = audioPlayers[index + 1];
                     if (nextAudio) {
+                        audio.style.display = 'none';
                         nextAudio.style.display = 'block';
                         nextAudio.play();
                     }
