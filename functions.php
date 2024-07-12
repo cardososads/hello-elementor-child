@@ -76,7 +76,7 @@ function return_acf_introduction_options($form_name = 'Form1')
                 $subtitles[] = [];
             }
         }
-        var_dump($data['destiny_number']);
+        var_dump($data);
         foreach ($nums_destino as $option) {
             if ($data['destiny_number'] == $option['numero_destino_']) {
                 $audio_files[] = $option['audio_destino_'];
