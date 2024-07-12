@@ -33,13 +33,15 @@ function process_elementor_form_submission($record, $handler) {
             }
             break;
         case 'Form3':
-            // Tentar recuperar o valor de Form2
+            // Recuperar dados do Form2
             $form2_data = get_transient('formForm2_submission_data');
-            if (isset($form2_data['motivation_number'])) {
-                $fields['motivation_number'] = $form2_data['motivation_number'];
-            }
-            if (isset($form2_data['gender'])) {
-                $fields['gender'] = $form2_data['gender'];
+            if ($form2_data) {
+                if (isset($form2_data['motivation_number'])) {
+                    $fields['motivation_number'] = $form2_data['motivation_number'];
+                }
+                if (isset($form2_data['gender'])) {
+                    $fields['gender'] = $form2_data['gender'];
+                }
             }
             break;
     }
@@ -127,12 +129,15 @@ function return_acf_introduction_options($form_name = 'Form1') {
             $subtitles[] = [];
         }
     } else if ($form_name === 'Form3') {
-        $motivation_number = $data['motivation_number'];
-        $gender = $data['gender'];
-        $estado_civil = $data['marital_status'];
+        $motivation_number = isset($data['motivation_number']) ? $data['motivation_number'] : null;
+        $gender = isset($data['gender']) ? $data['gender'] : null;
+        $estado_civil = isset($data['marital_status']) ? $data['marital_status'] : null;
+
+        // Depuração
         var_dump($motivation_number);
         var_dump($gender);
         var_dump($estado_civil);
+
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['genero_motivacao_'] == $gender && $option['estado_civil_motivacao_'] == $estado_civil) {
                 $audio_files[] = $option['audio_motivacao_'];
