@@ -13,9 +13,10 @@ require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 function process_elementor_form_submission($record, $handler) {
     $form_name = $record->get_form_settings('form_name');
-    $fields = array_map(function($field) {
-        return $field['value'];
-    }, $record->get('fields'));
+    $fields = [];
+    foreach ($record->get('fields') as $field) {
+        $fields[$field['name']] = $field['value'];
+    }
 
     $calculator = new NumerologyCalculator();
 
@@ -216,4 +217,3 @@ function return_acf_introduction_options_shortcode($atts) {
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
-//
