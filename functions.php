@@ -103,8 +103,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         $legenda_json = '';
         //var_dump($nums_expressao);
         foreach ($nums_expressao as $option) {
-            var_dump($expression_number == $option['numero_expressao_']);
-            if ($expression_number == $option['numero_expressao_'] && $option['genero_'] == $gender) {
+            if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_file = $option['audio_expressao_'];
                 $legenda_json = $option['legenda_expressao_'];
                 break;
