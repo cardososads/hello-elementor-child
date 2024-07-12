@@ -76,10 +76,9 @@ function return_acf_introduction_options($form_name = 'Form1')
                 $subtitles[] = [];
             }
         }
-
+        var_dump($data['destiny_number']);
         foreach ($nums_destino as $option) {
             if ($data['destiny_number'] == $option['numero_destino_']) {
-                var_dump($data['destiny_number']);
                 $audio_files[] = $option['audio_destino_'];
                 $legenda_json = $option['legenda_destino_'];
 
