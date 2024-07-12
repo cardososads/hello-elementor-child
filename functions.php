@@ -116,7 +116,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         $motivation_number = $data['motivation_number'];
         $gender = $data['gender'];
         $estado_civil = $data['marital_status']; // Atualizado para pegar o ID correto
-        var_dump($motivation_number);
+        var_dump($data);
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['genero_motivacao_'] == $gender && $option['estado_civil_motivacao_'] == $estado_civil) {
                 $audio_files[] = $option['audio_motivacao_'];
