@@ -9,10 +9,16 @@ require get_stylesheet_directory() . '/inc/class-acf-options.php';
 require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
 require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 
+// Array global para armazenar dados dos formulários
+global $form_submission_data;
+$form_submission_data = [];
+
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
 function process_elementor_form_submission($record, $handler) {
+    global $form_submission_data;
+
     // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
 
@@ -32,26 +38,39 @@ function process_elementor_form_submission($record, $handler) {
         case 'Form2':
             $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
             break;
+        case 'Form3':
+            // Adicione o processamento necessário para Form3
+            $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['email']);
+            break;
     }
 
     // Armazena os dados do formulário usando transients para acesso global
     set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
+
+    // Armazena os dados no array global
+    $form_submission_data[$form_name] = $fields;
 }
 
 // Função para obter os dados dos formulários
 function forms_data($form) {
+    global $form_submission_data;
+
     // Verifique se o formulário é Form1, Form2 ou Form3
     if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
         // Obtenha os dados do transient com base no nome do formulário
-        $data = get_transient('form' . $form . '_submission_data');
-        return $data;
+        if (!isset($form_submission_data[$form])) {
+            $data = get_transient('form' . $form . '_submission_data');
+            if ($data) {
+                $form_submission_data[$form] = $data;
+            }
+        }
+        return $form_submission_data[$form] ?? null;
     }
 
     return null;
 }
 
-function return_acf_introduction_options($form_name = 'Form1')
-{
+function return_acf_introduction_options($form_name = 'Form1') {
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
@@ -59,13 +78,16 @@ function return_acf_introduction_options($form_name = 'Form1')
     $audio_files = [];
     $subtitles = [];
 
+    // Função para corrigir JSON
+    function fix_json($json_string) {
+        $json_string = preg_replace('/(\w+):/i', '"$1":', $json_string);
+        return $json_string;
+    }
+
     if ($form_name === 'Form1') {
         foreach ($intros as $option) {
             $audio_files[] = $option['audio_de_introducao_'];
-            $legenda_json = $option['legenda_de_introducao_'];
-
-            // Correção do JSON: adicionar aspas duplas corretamente
-            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda_json = fix_json($option['legenda_de_introducao_']);
             $legenda = json_decode($legenda_json, true);
 
             if (json_last_error() === JSON_ERROR_NONE) {
@@ -74,14 +96,11 @@ function return_acf_introduction_options($form_name = 'Form1')
                 $subtitles[] = [];
             }
         }
-//        var_dump($data);
+
         foreach ($nums_destino as $option) {
             if ($data['destiny_number'] == $option['numero_destino_']) {
                 $audio_files[] = $option['audio_destino_'];
-                $legenda_json = $option['legenda_destino_'];
-
-                // Correção do JSON: adicionar aspas duplas corretamente
-                $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+                $legenda_json = fix_json($option['legenda_destino_']);
                 $legenda = json_decode($legenda_json, true);
 
                 if (json_last_error() === JSON_ERROR_NONE) {
@@ -95,24 +114,19 @@ function return_acf_introduction_options($form_name = 'Form1')
         // Verifique o gênero e selecione o áudio e a legenda apropriados
         $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
         $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
-        var_dump($gender);
-        var_dump($expression_number);
+
         $audio_file = '';
         $legenda_json = '';
-        //var_dump($nums_expressao);
+
         foreach ($nums_expressao as $option) {
-            var_dump($option['numero_expressao_']);
             if ($expression_number == $option['numero_expressao_'] && $option['genero_'] == $gender) {
                 $audio_file = $option['audio_expressao_'];
-                $legenda_json = $option['legenda_expressao_'];
+                $legenda_json = fix_json($option['legenda_expressao_']);
                 break;
             }
         }
 
         $audio_files[] = $audio_file;
-
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
         $legenda = json_decode($legenda_json, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
@@ -123,10 +137,7 @@ function return_acf_introduction_options($form_name = 'Form1')
     } else if ($form_name === 'Form3') {
         // Assumindo que existe apenas um áudio e uma legenda para Form3
         $audio_files[] = $data['audio'];
-        $legenda_json = $data['legenda'];
-
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+        $legenda_json = fix_json($data['legenda']);
         $legenda = json_decode($legenda_json, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
@@ -204,8 +215,7 @@ function return_acf_introduction_options($form_name = 'Form1')
     <?php
 }
 
-function return_acf_introduction_options_shortcode($atts)
-{
+function return_acf_introduction_options_shortcode($atts) {
     $atts = shortcode_atts(array(
         'form' => 'Form1',
     ), $atts, 'return_players');
