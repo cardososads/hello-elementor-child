@@ -109,7 +109,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         $audio_files[] = $audio_file;
 
         // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+        $legenda_json = str_replace("'", '"', $legenda_json);
         $legenda = json_decode($legenda_json, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
@@ -123,7 +123,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         $legenda_json = $data['legenda'];
 
         // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+        $legenda_json = str_replace("'", '"', $legenda_json);
         $legenda = json_decode($legenda_json, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
