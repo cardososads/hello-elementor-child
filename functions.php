@@ -129,7 +129,7 @@ function return_acf_introduction_options($form_name = 'Form1')
 
         $audio_file = '';
         $legenda_json = '';
-
+        var_dump($data);
         foreach ($nums_expressao as $option) {
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_file = $option['audio_expressao_'];
@@ -164,7 +164,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             $subtitles[] = [];
         }
     }
-
+    var_dump($data);
     foreach ($audio_files as $index => $audio_src) {
         ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
