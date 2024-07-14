@@ -136,8 +136,9 @@ function return_acf_introduction_options($form_name = 'Form1')
         foreach ($intros as $option) {
             $audio_files[] = $option['audio_de_introducao_'];
             $legenda_json = $option['legenda_de_introducao_'];
-            var_dump($legenda_json);
-            // Correção do JSON: adicionar aspas duplas corretamente
+            echo '<pre>';
+            var_dump($option);
+            echo '</pre>';            // Correção do JSON: adicionar aspas duplas corretamente
             $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
             $legenda = json_decode($legenda_json, true);
 
