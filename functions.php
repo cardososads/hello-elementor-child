@@ -148,14 +148,13 @@ function return_acf_introduction_options($form_name = 'Form1')
         }
     } else if ($form_name === 'Form3') {
         $calculator = new NumerologyCalculator();
-        $motivation_number = $calculator->calculateMotivationNumber($data['full_name']); // Supondo que 'motivation_number' está disponível nos dados do formulário
-        var_dump($data, $motivation_number, $nums_motivacao);
-        $relationship_status = $data['relationship_status']; // Supondo que 'relationship_status' está disponível nos dados do formulário
+        $motivation_number = $calculator->calculateMotivationNumber($data['full_name']);
+        $relationship_status = $data['marital_status']; // Supondo que 'marital_status' está disponível nos dados do formulário
+
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['estado_civil_motivacao_'] == $relationship_status) {
                 $audio_files[] = $option['audio_motivacao_'];
                 $legenda_json = $option['legenda_motivacao_'];
-                print_r($option);
 
                 // Correção do JSON: adicionar aspas duplas corretamente
                 $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
@@ -247,21 +246,6 @@ function return_acf_introduction_options_shortcode($atts)
     ob_start();
     return_acf_introduction_options($atts['form']);
     return ob_get_clean();
-}
-
-add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
-?>
-
-
-function return_acf_introduction_options_shortcode($atts)
-{
-$atts = shortcode_atts(array(
-'form' => 'Form1',
-), $atts, 'return_players');
-
-ob_start();
-return_acf_introduction_options($atts['form']);
-return ob_get_clean();
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
