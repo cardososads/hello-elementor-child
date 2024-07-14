@@ -97,6 +97,7 @@ function return_acf_introduction_options($form_name = 'Form1')
 
     if ($form_name === 'Form1') {
         foreach ($intros as $option) {
+            var_dump($option);
             $audio_files[] = $option['audio_de_introducao_'];
             $legenda_json = $option['legenda_de_introducao_'];
 
