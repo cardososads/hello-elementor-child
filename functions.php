@@ -1,4 +1,5 @@
 <?php
+// Certifique-se de que não há espaços antes deste início de PHP
 
 // 1. Enqueue Styles
 function hello_elementor_child_enqueue_styles()
@@ -133,7 +134,6 @@ function return_acf_introduction_options_shortcode($atts)
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
-
 ?>
 
 <!-- 7. JavaScript para Processar o Formulário e Atualizar Legendas -->
@@ -146,18 +146,27 @@ add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
             const form = event.target;
             const formData = new FormData(form);
 
-            const response = await fetch(form.action, {
-                method: 'POST',
-                body: formData
-            });
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
 
-            const result = await response.json();
+                if (!response.ok) {
+                    throw new Error('Erro na resposta do servidor');
+                }
 
-            if (result.success) {
-                const formName = form.querySelector('input[name="form_name"]').value;
-                localStorage.setItem(`form${formName}_submission_data`, JSON.stringify(result.data));
-                alert('Formulário processado e dados armazenados no localStorage.');
-            } else {
+                const result = await response.json();
+
+                if (result.success) {
+                    const formName = form.querySelector('input[name="form_name"]').value;
+                    localStorage.setItem(`form${formName}_submission_data`, JSON.stringify(result.data));
+                    alert('Formulário processado e dados armazenados no localStorage.');
+                } else {
+                    alert('Erro ao processar o formulário.');
+                }
+            } catch (error) {
+                console.error('Erro ao processar o formulário:', error);
                 alert('Erro ao processar o formulário.');
             }
         }
