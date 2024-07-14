@@ -51,11 +51,8 @@ function process_elementor_form_submission($record, $handler)
             break;
     }
 
-    // Envia os dados processados como resposta JSON
-    wp_send_json_success($fields);
-
-    // Garanta que o script pare aqui e não envie nenhum HTML
-    wp_die();
+    // Armazena os dados do formulário usando transients para acesso global
+    set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
 // Função para obter os dados dos formulários
@@ -111,6 +108,7 @@ function return_acf_introduction_options($form_name = 'Form1')
                 $subtitles[] = [];
             }
         }
+        var_dump($data);
         foreach ($nums_destino as $option) {
             if ($data['destiny_number'] == $option['numero_destino_']) {
                 $audio_files[] = $option['audio_destino_'];
@@ -134,6 +132,7 @@ function return_acf_introduction_options($form_name = 'Form1')
 
         $audio_file = '';
         $legenda_json = '';
+        var_dump($data);
         foreach ($nums_expressao as $option) {
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_file = $option['audio_expressao_'];
@@ -168,6 +167,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             $subtitles[] = [];
         }
     }
+    var_dump($data);
     foreach ($audio_files as $index => $audio_src) {
 ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
@@ -177,13 +177,11 @@ function return_acf_introduction_options($form_name = 'Form1')
     ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            sessionStorage.setItem('subtitles', JSON.stringify(<?php echo json_encode($subtitles); ?>));
-
             const audioPlayers = document.querySelectorAll('audio');
+            const subtitles = <?php echo json_encode($subtitles); ?>;
             const legendaDivs = document.querySelectorAll('.legenda');
 
             function updateLegenda(index, currentTime) {
-                const subtitles = JSON.parse(sessionStorage.getItem('subtitles'));
                 const legendasParaAudio = subtitles[index];
                 const legendaDiv = legendaDivs[index];
                 let displayed = false;
