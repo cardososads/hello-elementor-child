@@ -151,22 +151,22 @@ function return_acf_introduction_options($form_name = 'Form1')
             }
         }
 
-        foreach ($nums_expressao as $option) {
-            if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
-                $audio_files[] = $option['audio_expressao_'];
-                $legenda_json = $option['legenda_expressao_'];
-                var_dump($legenda_json);
-                // Correção do JSON: adicionar aspas duplas corretamente
-                $legenda_json = str_replace("'", '"', $legenda_json);
-                $legenda = json_decode($legenda_json, true);
+        // foreach ($nums_expressao as $option) {
+        //     if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
+        //         $audio_files[] = $option['audio_expressao_'];
+        //         $legenda_json = $option['legenda_expressao_'];
+        //         var_dump($legenda_json);
+        //         // Correção do JSON: adicionar aspas duplas corretamente
+        //         $legenda_json = str_replace("'", '"', $legenda_json);
+        //         $legenda = json_decode($legenda_json, true);
 
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $subtitles[] = $legenda;
-                } else {
-                    $subtitles[] = [];
-                }
-            }
-        }
+        //         if (json_last_error() === JSON_ERROR_NONE) {
+        //             $subtitles[] = $legenda;
+        //         } else {
+        //             $subtitles[] = [];
+        //         }
+        //     }
+        // }
     } else if ($form_name === 'Form3') {
         $relationship_status = $data['relationship_status']; // Supondo que 'relationship_status' está disponível nos dados do formulário
         $motivation_number = $data['motivation_number']; // Supondo que 'motivation_number' está disponível nos dados do formulário
