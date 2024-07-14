@@ -49,9 +49,12 @@ class NumerologyCalculator
         // Itera sobre cada caractere do nome completo
         for ($i = 0; $i < strlen($fullName); $i++) {
             if ($this->isVowel($fullName[$i])) {
-                $total += $this->charToNumber($fullName[$i]);
+                $total += $this->vowelToNumber($fullName[$i]);
             }
         }
+
+        // Adicione esta linha para verificar o valor total antes da redução
+        error_log("Total antes da redução: " . $total);
 
         // Reduz o valor total para um único dígito ou número mestre
         return $this->reduceToSingleDigitOrMasterNumber($total);
@@ -61,6 +64,27 @@ class NumerologyCalculator
     private function isVowel($char)
     {
         return in_array(strtoupper($char), ['A', 'E', 'I', 'O', 'U']);
+    }
+
+    // Função para converter uma vogal em número conforme a numerologia
+    private function vowelToNumber($char)
+    {
+        $char = strtoupper($char);
+
+        switch ($char) {
+            case 'A':
+                return 1;
+            case 'E':
+                return 5;
+            case 'I':
+                return 9;
+            case 'O':
+                return 6;
+            case 'U':
+                return 3;
+            default:
+                return 0;
+        }
     }
 
     // Função para converter um caractere em número conforme a numerologia cabalística
