@@ -95,21 +95,23 @@ function return_acf_introduction_options($form_name = 'Form1')
     $audio_files = [];
     $subtitles = [];
 
-    if ($form_name === 'Form1') {
-        foreach ($intros as $option) {
-            $audio_files[] = $option['audio_de_introducao_'];
-            $legenda_json = $option['legenda_de_introducao_'];
+    // Sempre inclua os áudios e legendas de introdução
+    foreach ($intros as $option) {
+        $audio_files[] = $option['audio_de_introducao_'];
+        $legenda_json = $option['legenda_de_introducao_'];
 
-            // Correção do JSON: adicionar aspas duplas corretamente
-            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-            $legenda = json_decode($legenda_json, true);
+        // Correção do JSON: adicionar aspas duplas corretamente
+        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+        $legenda = json_decode($legenda_json, true);
 
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $subtitles[] = $legenda;
-            } else {
-                $subtitles[] = [];
-            }
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $subtitles[] = $legenda;
+        } else {
+            $subtitles[] = [];
         }
+    }
+
+    if ($form_name === 'Form1') {
         foreach ($nums_destino as $option) {
             if ($data['destiny_number'] == $option['numero_destino_']) {
                 $audio_files[] = $option['audio_destino_'];
@@ -134,10 +136,10 @@ function return_acf_introduction_options($form_name = 'Form1')
         var_dump($expression_number);
         echo '</pre>';
         foreach ($nums_expressao as $option) {
-            if($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender){
+            if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_files[] = $option['audio_expressao_'];
                 $legenda_json = $option['legenda_expressao_'];
-        
+
                 $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
                 $legenda = json_decode($legenda_json, true);
 
@@ -148,25 +150,9 @@ function return_acf_introduction_options($form_name = 'Form1')
                 }
             }
         }
-
     } else if ($form_name === 'Form3') {
         $relationship_status = $data['relationship_status']; // Supondo que 'relationship_status' está disponível nos dados do formulário
         $motivation_number = $data['motivation_number']; // Supondo que 'motivation_number' está disponível nos dados do formulário
-
-        foreach ($intros as $option) {
-            $audio_files[] = $option['audio_de_introducao_'];
-            $legenda_json = $option['legenda_de_introducao_'];
-
-            // Correção do JSON: adicionar aspas duplas corretamente
-            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-            $legenda = json_decode($legenda_json, true);
-
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $subtitles[] = $legenda;
-            } else {
-                $subtitles[] = [];
-            }
-        }
 
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['estado_civil_motivacao_'] == $relationship_status) {
