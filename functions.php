@@ -1,6 +1,6 @@
 <?php
-
-function hello_elementor_child_enqueue_styles() {
+function hello_elementor_child_enqueue_styles()
+{
     wp_enqueue_style('hello-elementor-style', get_template_directory_uri() . '/style.css');
     wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'));
 }
@@ -10,15 +10,25 @@ require get_stylesheet_directory() . '/inc/class-acf-options.php';
 require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
 require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 
+// Inicializa a sessão
+function start_session()
+{
+    if (!session_id()) {
+        session_start();
+    }
+}
+add_action('init', 'start_session', 1);
+
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
-function process_elementor_form_submission($record, $handler) {
+function process_elementor_form_submission($record, $handler)
+{
     // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
 
     // Obtenha os dados do formulário
-    $fields = array_map(function($field) {
+    $fields = array_map(function ($field) {
         return $field['value'];
     }, $record->get('fields'));
 
@@ -29,55 +39,45 @@ function process_elementor_form_submission($record, $handler) {
     switch ($form_name) {
         case 'Form1':
             $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
+            $_SESSION['form1_data'] = $fields;
             break;
         case 'Form2':
             $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
-            $form1_data = get_transient('formForm1_submission_data');
-            if ($form1_data) {
-                $fields = array_merge($form1_data, $fields);
+            if (isset($_SESSION['form1_data'])) {
+                $fields = array_merge($_SESSION['form1_data'], $fields);
             }
+            $_SESSION['form2_data'] = $fields;
             break;
         case 'Form3':
-            $form1_data = get_transient('formForm1_submission_data');
-            $form2_data = get_transient('formForm2_submission_data');
-            if ($form1_data) {
-                $fields = array_merge($form1_data, $fields);
+            if (isset($_SESSION['form1_data'])) {
+                $fields = array_merge($_SESSION['form1_data'], $fields);
             }
-            if ($form2_data) {
-                $fields = array_merge($form2_data, $fields);
+            if (isset($_SESSION['form2_data'])) {
+                $fields = array_merge($_SESSION['form2_data'], $fields);
             }
+            $_SESSION['form3_data'] = $fields;
             break;
     }
-
-    // Armazena os dados do formulário usando transients para acesso global
-    set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
 // Função para obter os dados dos formulários
-function forms_data($form) {
-    // Verifique se o formulário é Form1, Form2 ou Form3
+function forms_data($form)
+{
     if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
-        // Obtenha os dados do transient com base no nome do formulário
-        $form1_data = get_transient('formForm1_submission_data');
-        $form2_data = get_transient('formForm2_submission_data');
-        $form_data = get_transient('form' . $form . '_submission_data');
-
-        if ($form === 'Form2' && $form1_data) {
-            $form_data = array_merge($form1_data, $form_data);
+        $data = isset($_SESSION[strtolower($form) . '_data']) ? $_SESSION[strtolower($form) . '_data'] : null;
+        if ($form === 'Form2' && isset($_SESSION['form1_data'])) {
+            $data = array_merge($_SESSION['form1_data'], $data);
         }
-
         if ($form === 'Form3') {
-            if ($form1_data) {
-                $form_data = array_merge($form1_data, $form_data);
+            if (isset($_SESSION['form1_data'])) {
+                $data = array_merge($_SESSION['form1_data'], $data);
             }
-            if ($form2_data) {
-                $form_data = array_merge($form2_data, $form_data);
+            if (isset($_SESSION['form2_data'])) {
+                $data = array_merge($_SESSION['form2_data'], $data);
             }
         }
-
-        return $form_data;
+        return $data;
     }
-
     return null;
 }
 
@@ -86,7 +86,7 @@ function return_acf_introduction_options($form_name = 'Form1')
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
-    $data = forms_data($form_name); // Use o nome do formulário passado como parâmetro
+    $data = forms_data($form_name);
     $audio_files = [];
     $subtitles = [];
 
@@ -105,7 +105,6 @@ function return_acf_introduction_options($form_name = 'Form1')
                 $subtitles[] = [];
             }
         }
-        var_dump($data);
         foreach ($nums_destino as $option) {
             if ($data['destiny_number'] == $option['numero_destino_']) {
                 $audio_files[] = $option['audio_destino_'];
@@ -123,13 +122,12 @@ function return_acf_introduction_options($form_name = 'Form1')
             }
         }
     } else if ($form_name === 'Form2') {
-        // Verifique o gênero e selecione o áudio e a legenda apropriados
-        $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
-        $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
+        $gender = $data['gender'];
+        $expression_number = $data['expression_number'];
 
         $audio_file = '';
         $legenda_json = '';
-        var_dump($data);
+
         foreach ($nums_expressao as $option) {
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_file = $option['audio_expressao_'];
@@ -150,7 +148,6 @@ function return_acf_introduction_options($form_name = 'Form1')
             $subtitles[] = [];
         }
     } else if ($form_name === 'Form3') {
-        // Assumindo que existe apenas um áudio e uma legenda para Form3
         $audio_files[] = $data['audio'];
         $legenda_json = $data['legenda'];
 
@@ -164,12 +161,12 @@ function return_acf_introduction_options($form_name = 'Form1')
             $subtitles[] = [];
         }
     }
-    var_dump($data);
+
     foreach ($audio_files as $index => $audio_src) {
-        ?>
+?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
         <div id="legenda_<?= $index ?>" class="legenda" style="display: none;"></div>
-        <?php
+    <?php
     }
     ?>
     <script>
@@ -230,7 +227,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             color: #333;
         }
     </style>
-    <?php
+<?php
 }
 
 function return_acf_introduction_options_shortcode($atts)
