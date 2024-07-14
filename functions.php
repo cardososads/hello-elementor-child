@@ -64,7 +64,7 @@ function process_elementor_form_submission($record, $handler)
 
     // Atualiza os dados no localStorage
     echo '<script>
-        localStorage.setItem("' . strtolower($form_name) . '_data", ' . json_encode($fields) . ');
+        localStorage.setItem("' . strtolower($form_name) . '_data", JSON.stringify(' . json_encode($fields) . '));
     </script>';
 }
 
