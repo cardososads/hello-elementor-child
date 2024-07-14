@@ -4,10 +4,20 @@ function hello_elementor_child_enqueue_styles()
     wp_enqueue_style('hello-elementor-style', get_template_directory_uri() . '/style.css');
     wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'));
 }
-add_action('wp_enqueue_scripts', 'hello-elementor_child_enqueue_styles');
+add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
+require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
 require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
+
+// Inicializa a sessão
+function start_session()
+{
+    if (!session_id()) {
+        session_start();
+    }
+}
+add_action('init', 'start_session', 1);
 
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
@@ -29,123 +39,140 @@ function process_elementor_form_submission($record, $handler)
     switch ($form_name) {
         case 'Form1':
             $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
+            $_SESSION['form1_data'] = $fields;
             break;
         case 'Form2':
             $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
+            if (isset($_SESSION['form1_data'])) {
+                $fields = array_merge($_SESSION['form1_data'], $fields);
+            }
+            $_SESSION['form2_data'] = $fields;
             break;
         case 'Form3':
-            // Qualquer lógica específica para o Form3
+            if (isset($_SESSION['form1_data'])) {
+                $fields = array_merge($_SESSION['form1_data'], $fields);
+            }
+            if (isset($_SESSION['form2_data'])) {
+                $fields = array_merge($_SESSION['form2_data'], $fields);
+            }
+            $_SESSION['form3_data'] = $fields;
             break;
     }
-
-    // Envia os dados para o JavaScript
-?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const formName = '<?= $form_name ?>';
-            const formData = <?= json_encode($fields) ?>;
-            localStorage.setItem(formName, JSON.stringify(formData));
-        });
-    </script>
-<?php
 }
 
-// Função para obter os dados dos formulários do localStorage
+// Função para obter os dados dos formulários
 function forms_data($form)
 {
-?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const formData = JSON.parse(localStorage.getItem('<?= $form ?>')) || {};
-            console.log(formData);
-        });
-    </script>
-<?php
-    return "<div id='form-data'></div>";
+    if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
+        $data = isset($_SESSION[strtolower($form) . '_data']) ? $_SESSION[strtolower($form) . '_data'] : null;
+        if ($form === 'Form2' && isset($_SESSION['form1_data'])) {
+            $data = array_merge($_SESSION['form1_data'], $data);
+        }
+        if ($form === 'Form3') {
+            if (isset($_SESSION['form1_data'])) {
+                $data = array_merge($_SESSION['form1_data'], $data);
+            }
+            if (isset($_SESSION['form2_data'])) {
+                $data = array_merge($_SESSION['form2_data'], $data);
+            }
+        }
+        return $data;
+    }
+    return null;
 }
 
-// Função para retornar opções de introdução do ACF
 function return_acf_introduction_options($form_name = 'Form1')
 {
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
+    $data = forms_data($form_name);
+    $audio_files = [];
+    $subtitles = [];
 
-?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const formName = '<?= $form_name ?>';
-            const data = JSON.parse(localStorage.getItem(formName)) || {};
-            const intros = <?= json_encode($intros) ?>;
-            const nums_destino = <?= json_encode($nums_destino) ?>;
-            const nums_expressao = <?= json_encode($nums_expressao) ?>;
-            let audio_files = [];
-            let subtitles = [];
+    if ($form_name === 'Form1') {
+        foreach ($intros as $option) {
+            $audio_files[] = $option['audio_de_introducao_'];
+            $legenda_json = $option['legenda_de_introducao_'];
 
-            if (formName === 'Form1') {
-                intros.forEach(option => {
-                    audio_files.push(option['audio_de_introducao_']);
-                    let legenda_json = option['legenda_de_introducao_'];
-                    legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
-                    try {
-                        let legenda = JSON.parse(legenda_json);
-                        subtitles.push(legenda);
-                    } catch (e) {
-                        console.error('Erro ao parsear legenda JSON:', e);
-                    }
-                });
-                nums_destino.forEach(option => {
-                    if (data.destiny_number == option['numero_destino_']) {
-                        audio_files.push(option['audio_destino_']);
-                        let legenda_json = option['legenda_destino_'];
-                        legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
-                        try {
-                            let legenda = JSON.parse(legenda_json);
-                            subtitles.push(legenda);
-                        } catch (e) {
-                            console.error('Erro ao parsear legenda JSON:', e);
-                        }
-                    }
-                });
-            } else if (formName === 'Form2') {
-                let gender = data.gender;
-                let expression_number = data.expression_number;
-                let audio_file = '';
-                let legenda_json = '';
+            // Correção do JSON: adicionar aspas duplas corretamente
+            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda = json_decode($legenda_json, true);
 
-                nums_expressao.forEach(option => {
-                    if (expression_number == option['numero_expressao_'] && option['genero_expressao_'] == gender) {
-                        audio_file = option['audio_expressao_'];
-                        legenda_json = option['legenda_expressao_'];
-                    }
-                });
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $subtitles[] = $legenda;
+            } else {
+                $subtitles[] = [];
+            }
+        }
+        foreach ($nums_destino as $option) {
+            if ($data['destiny_number'] == $option['numero_destino_']) {
+                $audio_files[] = $option['audio_destino_'];
+                $legenda_json = $option['legenda_destino_'];
 
-                audio_files.push(audio_file);
-                legenda_json = legenda_json.replace(/'/g, '"');
-                try {
-                    let legenda = JSON.parse(legenda_json);
-                    subtitles.push(legenda);
-                } catch (e) {
-                    console.error('Erro ao parsear legenda JSON:', e);
-                }
-            } else if (formName === 'Form3') {
-                audio_files.push(data['audio']);
-                let legenda_json = data['legenda'];
-                legenda_json = legenda_json.replace(/'/g, '"');
-                try {
-                    let legenda = JSON.parse(legenda_json);
-                    subtitles.push(legenda);
-                } catch (e) {
-                    console.error('Erro ao parsear legenda JSON:', e);
+                // Correção do JSON: adicionar aspas duplas corretamente
+                $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+                $legenda = json_decode($legenda_json, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $subtitles[] = $legenda;
+                } else {
+                    $subtitles[] = [];
                 }
             }
+        }
+    } else if ($form_name === 'Form2') {
+        $gender = $data['gender'];
+        $expression_number = $data['expression_number'];
 
-            audio_files.forEach((audio_src, index) => {
-                document.write(`<audio id="audio_player_${index}" src="${audio_src}" controls ${index > 0 ? 'style="display:none;"' : ''}></audio>`);
-                document.write(`<div id="legenda_${index}" class="legenda" style="display: none;"></div>`);
-            });
+        $audio_file = '';
+        $legenda_json = '';
 
+        foreach ($nums_expressao as $option) {
+            if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
+                $audio_file = $option['audio_expressao_'];
+                $legenda_json = $option['legenda_expressao_'];
+                break;
+            }
+        }
+
+        $audio_files[] = $audio_file;
+
+        // Correção do JSON: adicionar aspas duplas corretamente
+        $legenda_json = str_replace("'", '"', $legenda_json);
+        $legenda = json_decode($legenda_json, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $subtitles[] = $legenda;
+        } else {
+            $subtitles[] = [];
+        }
+    } else if ($form_name === 'Form3') {
+        $audio_files[] = $data['audio'];
+        $legenda_json = $data['legenda'];
+
+        // Correção do JSON: adicionar aspas duplas corretamente
+        $legenda_json = str_replace("'", '"', $legenda_json);
+        $legenda = json_decode($legenda_json, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $subtitles[] = $legenda;
+        } else {
+            $subtitles[] = [];
+        }
+    }
+
+    foreach ($audio_files as $index => $audio_src) {
+?>
+        <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
+        <div id="legenda_<?= $index ?>" class="legenda" style="display: none;"></div>
+    <?php
+    }
+    ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             const audioPlayers = document.querySelectorAll('audio');
+            const subtitles = <?php echo json_encode($subtitles); ?>;
             const legendaDivs = document.querySelectorAll('.legenda');
 
             function updateLegenda(index, currentTime) {
@@ -187,6 +214,7 @@ function return_acf_introduction_options($form_name = 'Form1')
                 });
             });
 
+            // Start playing the first audio automatically
             if (audioPlayers.length > 0) {
                 audioPlayers[0].play();
             }
