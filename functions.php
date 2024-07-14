@@ -87,7 +87,7 @@ function forms_data($form)
 
 function return_acf_introduction_options($form_name = 'Form1')
 {
-    $intros = ACFOptions::get_field('acf_introducoes');
+    $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
     $nums_motivacao = ACFOptions::get_field('acf_numeros_de_motivacao');
