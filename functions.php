@@ -74,6 +74,11 @@ function process_elementor_form_submission($record, $handler)
 
     // Atualiza os dados da sessão
     $_SESSION[strtolower($form_name) . '_data'] = $fields;
+
+    // Atualiza os dados no localStorage
+    echo '<script>
+        localStorage.setItem("' . strtolower($form_name) . '_data", JSON.stringify(' . json_encode($fields) . '));
+    </script>';
 }
 
 // Função para obter os dados dos formulários
@@ -242,6 +247,29 @@ function return_acf_introduction_options($form_name = 'Form1')
             if (audioPlayers.length > 0) {
                 audioPlayers[0].play();
             }
+
+            // Preencher o formulário com os dados do localStorage
+            const formName = "<?php echo $form_name; ?>";
+            const formData = JSON.parse(localStorage.getItem(formName.toLowerCase() + '_data'));
+
+            if (formData) {
+                for (const [key, value] of Object.entries(formData)) {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        input.value = value;
+                    }
+                }
+            }
+
+            // Salvar dados do formulário no localStorage ao enviar
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function() {
+                const formData = {};
+                new FormData(form).forEach((value, key) => {
+                    formData[key] = value;
+                });
+                localStorage.setItem(formName.toLowerCase() + '_data', JSON.stringify(formData));
+            });
         });
     </script>
     <style>
