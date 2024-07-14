@@ -131,7 +131,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
         $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
         echo '<pre>';
-        var_dump($data);
+        var_dump($expression_number);
         echo '</pre>';
         foreach ($nums_expressao as $option) {
             $audio_files[] = $option['audio_expressao_'];
