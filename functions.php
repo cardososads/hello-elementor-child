@@ -56,6 +56,9 @@ function process_elementor_form_submission($record, $handler)
 
     // Retorne os dados processados como resposta JSON
     wp_send_json_success($fields);
+
+    // Garanta que o script pare aqui e não envie nenhum HTML
+    wp_die();
 }
 
 // 4. Função para Obter Dados dos Formulários
