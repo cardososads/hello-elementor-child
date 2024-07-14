@@ -95,29 +95,11 @@ function return_acf_introduction_options($form_name = 'Form1')
     $audio_files = [];
     $subtitles = [];
 
-    // Sempre inclua os áudios e legendas de introdução
-    foreach ($intros as $option) {
-        $audio_files[] = $option['audio_de_introducao_'];
-        $legenda_json = $option['legenda_de_introducao_'];
-
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
-
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
-        }
-    }
-
     if ($form_name === 'Form1') {
         foreach ($intros as $option) {
             $audio_files[] = $option['audio_de_introducao_'];
             $legenda_json = $option['legenda_de_introducao_'];
-            echo '<pre>';
-            var_dump($data);
-            echo '</pre>';
+
             // Correção do JSON: adicionar aspas duplas corretamente
             $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
             $legenda = json_decode($legenda_json, true);
