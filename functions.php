@@ -40,6 +40,7 @@ function process_elementor_form_submission($record, $handler)
             }
             break;
         case 'Form3':
+            $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
             $form1_data = get_transient('formForm1_submission_data');
             $form2_data = get_transient('formForm2_submission_data');
             if ($form1_data) {
@@ -86,9 +87,10 @@ function forms_data($form)
 
 function return_acf_introduction_options($form_name = 'Form1')
 {
-    $intros = ACFOptions::get_field('acf_intoducoes');
+    $intros = ACFOptions::get_field('acf_introducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
+    $nums_motivacao = ACFOptions::get_field('acf_numeros_de_motivacao');
     $data = forms_data($form_name); // Use o nome do formulário passado como parâmetro
     $audio_files = [];
     $subtitles = [];
@@ -129,40 +131,71 @@ function return_acf_introduction_options($form_name = 'Form1')
         $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
         $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
 
-        $audio_file = '';
-        $legenda_json = '';
-        foreach ($nums_expressao as $option) {
-            if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
-                $audio_file = $option['audio_expressao_'];
-                $legenda_json = $option['legenda_expressao_'];
-                break;
+        foreach ($intros as $option) {
+            $audio_files[] = $option['audio_de_introducao_'];
+            $legenda_json = $option['legenda_de_introducao_'];
+
+            // Correção do JSON: adicionar aspas duplas corretamente
+            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda = json_decode($legenda_json, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $subtitles[] = $legenda;
+            } else {
+                $subtitles[] = [];
             }
         }
 
-        $audio_files[] = $audio_file;
+        foreach ($nums_expressao as $option) {
+            if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
+                $audio_files[] = $option['audio_expressao_'];
+                $legenda_json = $option['legenda_expressao_'];
 
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = str_replace("'", '"', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
+                // Correção do JSON: adicionar aspas duplas corretamente
+                $legenda_json = str_replace("'", '"', $legenda_json);
+                $legenda = json_decode($legenda_json, true);
 
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $subtitles[] = $legenda;
+                } else {
+                    $subtitles[] = [];
+                }
+            }
         }
     } else if ($form_name === 'Form3') {
-        // Assumindo que existe apenas um áudio e uma legenda para Form3
-        $audio_files[] = $data['audio'];
-        $legenda_json = $data['legenda'];
+        $relationship_status = $data['relationship_status']; // Supondo que 'relationship_status' está disponível nos dados do formulário
+        $motivation_number = $data['motivation_number']; // Supondo que 'motivation_number' está disponível nos dados do formulário
 
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = str_replace("'", '"', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
+        foreach ($intros as $option) {
+            $audio_files[] = $option['audio_de_introducao_'];
+            $legenda_json = $option['legenda_de_introducao_'];
 
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
+            // Correção do JSON: adicionar aspas duplas corretamente
+            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda = json_decode($legenda_json, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $subtitles[] = $legenda;
+            } else {
+                $subtitles[] = [];
+            }
+        }
+
+        foreach ($nums_motivacao as $option) {
+            if ($motivation_number == $option['numero_motivacao_'] && $option['estado_civil_motivacao_'] == $relationship_status) {
+                $audio_files[] = $option['audio_motivacao_'];
+                $legenda_json = $option['legenda_motivacao_'];
+
+                // Correção do JSON: adicionar aspas duplas corretamente
+                $legenda_json = str_replace("'", '"', $legenda_json);
+                $legenda = json_decode($legenda_json, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $subtitles[] = $legenda;
+                } else {
+                    $subtitles[] = [];
+                }
+            }
         }
     }
 
