@@ -19,17 +19,6 @@ function start_session()
 }
 add_action('init', 'start_session', 1);
 
-// Limpa os dados dos formulários posteriores
-function clear_later_forms_data($form_name)
-{
-    if ($form_name === 'Form1') {
-        unset($_SESSION['form2_data']);
-        unset($_SESSION['form3_data']);
-    } elseif ($form_name === 'Form2') {
-        unset($_SESSION['form3_data']);
-    }
-}
-
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
@@ -37,9 +26,6 @@ function process_elementor_form_submission($record, $handler)
 {
     // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
-
-    // Limpa os dados dos formulários posteriores
-    clear_later_forms_data($form_name);
 
     // Obtenha os dados do formulário
     $fields = array_map(function ($field) {
