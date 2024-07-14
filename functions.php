@@ -151,7 +151,9 @@ function return_acf_introduction_options($form_name = 'Form1')
     } else if ($form_name === 'Form3') {
         $relationship_status = $data['relationship_status']; // Supondo que 'relationship_status' está disponível nos dados do formulário
         $motivation_number = $data['motivation_number']; // Supondo que 'motivation_number' está disponível nos dados do formulário
-        var_dump($data);
+        $calculator = new NumerologyCalculator();
+        print_r($calculator->calculateMotivationNumber($data['full_name']));
+        //var_dump($data);
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['estado_civil_motivacao_'] == $relationship_status) {
                 $audio_files[] = $option['audio_motivacao_'];
