@@ -133,9 +133,9 @@ function return_acf_introduction_options($form_name = 'Form1')
         echo '<pre>';
         var_dump($data);
         echo '</pre>';
-        foreach ($intros as $option) {
-            $audio_files[] = $option['audio_de_introducao_'];
-            $legenda_json = $option['legenda_de_introducao_'];
+        foreach ($nums_expressao as $option) {
+            $audio_files[] = $option['audio_expressao_'];
+            $legenda_json = $option['legenda_expressao_'];
             echo '<pre>';
             var_dump($option);
             echo '</pre>';            // Correção do JSON: adicionar aspas duplas corretamente
