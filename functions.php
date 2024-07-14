@@ -16,60 +16,48 @@ add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission'
 
 function process_elementor_form_submission($record, $handler)
 {
-    // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
-
-    // Obtenha os dados do formulário
     $fields = array_map(function ($field) {
         return $field['value'];
     }, $record->get('fields'));
 
-    // Instancia a classe de cálculo
     $calculator = new NumerologyCalculator();
+    $transient_key = "form{$form_name}_submission_data";
 
-    // Processa os dados conforme o formulário enviado
-    switch ($form_name) {
-        case 'Form1':
-            $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
-            break;
-        case 'Form2':
-            $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
-            $form1_data = get_transient('formForm1_submission_data');
-            if ($form1_data) {
-                $fields = array_merge($form1_data, $fields);
-            }
-            break;
-        case 'Form3':
-            $form1_data = get_transient('formForm1_submission_data');
-            $form2_data = get_transient('formForm2_submission_data');
-            if ($form1_data) {
-                $fields = array_merge($form1_data, $fields);
-            }
-            if ($form2_data) {
-                $fields = array_merge($form2_data, $fields);
-            }
-            break;
-    }
-
-    // Armazena os dados do formulário usando transients para acesso global
-    set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
-}
-
-// Função para obter os dados dos formulários
-function forms_data($form)
-{
-    // Verifique se o formulário é Form1, Form2 ou Form3
-    if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
-        // Obtenha os dados do transient com base no nome do formulário
+    if ($form_name === 'Form1') {
+        $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
+    } elseif ($form_name === 'Form2') {
+        $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
+        $form1_data = get_transient('formForm1_submission_data');
+        if ($form1_data) {
+            $fields = array_merge($form1_data, $fields);
+        }
+    } elseif ($form_name === 'Form3') {
         $form1_data = get_transient('formForm1_submission_data');
         $form2_data = get_transient('formForm2_submission_data');
-        $form_data = get_transient('form' . $form . '_submission_data');
-
-        if ($form === 'Form2' && $form1_data) {
-            $form_data = array_merge($form1_data, $form_data);
+        if ($form1_data) {
+            $fields = array_merge($form1_data, $fields);
         }
+        if ($form2_data) {
+            $fields = array_merge($form2_data, $fields);
+        }
+    }
 
-        if ($form === 'Form3') {
+    set_transient($transient_key, $fields, HOUR_IN_SECONDS);
+}
+
+function forms_data($form)
+{
+    if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
+        $form_data = get_transient('form' . $form . '_submission_data');
+        if ($form === 'Form2') {
+            $form1_data = get_transient('formForm1_submission_data');
+            if ($form1_data) {
+                $form_data = array_merge($form1_data, $form_data);
+            }
+        } elseif ($form === 'Form3') {
+            $form1_data = get_transient('formForm1_submission_data');
+            $form2_data = get_transient('formForm2_submission_data');
             if ($form1_data) {
                 $form_data = array_merge($form1_data, $form_data);
             }
@@ -77,10 +65,8 @@ function forms_data($form)
                 $form_data = array_merge($form2_data, $form_data);
             }
         }
-
         return $form_data;
     }
-
     return null;
 }
 
@@ -89,85 +75,55 @@ function return_acf_introduction_options($form_name = 'Form1')
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
-    $data = forms_data($form_name); // Use o nome do formulário passado como parâmetro
+    $data = forms_data($form_name);
+
+    echo '<pre>';
+    print_r($data);
+    echo '</pre>';
+
     $audio_files = [];
     $subtitles = [];
 
     if ($form_name === 'Form1') {
         foreach ($intros as $option) {
             $audio_files[] = $option['audio_de_introducao_'];
-            $legenda_json = $option['legenda_de_introducao_'];
-
-            // Correção do JSON: adicionar aspas duplas corretamente
-            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-            $legenda = json_decode($legenda_json, true);
-
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $subtitles[] = $legenda;
-            } else {
-                $subtitles[] = [];
-            }
+            $legenda_json = json_correct($option['legenda_de_introducao_']);
+            $subtitles[] = json_decode($legenda_json, true) ?: [];
         }
-        var_dump($data);
         foreach ($nums_destino as $option) {
             if ($data['destiny_number'] == $option['numero_destino_']) {
                 $audio_files[] = $option['audio_destino_'];
-                $legenda_json = $option['legenda_destino_'];
-
-                // Correção do JSON: adicionar aspas duplas corretamente
-                $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-                $legenda = json_decode($legenda_json, true);
-
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $subtitles[] = $legenda;
-                } else {
-                    $subtitles[] = [];
-                }
+                $legenda_json = json_correct($option['legenda_destino_']);
+                $subtitles[] = json_decode($legenda_json, true) ?: [];
             }
         }
-    } else if ($form_name === 'Form2') {
-        // Verifique o gênero e selecione o áudio e a legenda apropriados
-        $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
-        $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
-
-        $audio_file = '';
-        $legenda_json = '';
-        var_dump($data);
+    } elseif ($form_name === 'Form2') {
+        $gender = $data['gender'];
+        $expression_number = $data['expression_number'];
         foreach ($nums_expressao as $option) {
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
-                $audio_file = $option['audio_expressao_'];
-                $legenda_json = $option['legenda_expressao_'];
+                $audio_files[] = $option['audio_expressao_'];
+                $legenda_json = json_correct($option['legenda_expressao_']);
+                $subtitles[] = json_decode($legenda_json, true) ?: [];
                 break;
             }
         }
-
-        $audio_files[] = $audio_file;
-
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = str_replace("'", '"', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
-
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
-        }
-    } else if ($form_name === 'Form3') {
-        // Assumindo que existe apenas um áudio e uma legenda para Form3
+    } elseif ($form_name === 'Form3') {
         $audio_files[] = $data['audio'];
-        $legenda_json = $data['legenda'];
-
-        // Correção do JSON: adicionar aspas duplas corretamente
-        $legenda_json = str_replace("'", '"', $legenda_json);
-        $legenda = json_decode($legenda_json, true);
-
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $subtitles[] = $legenda;
-        } else {
-            $subtitles[] = [];
-        }
+        $legenda_json = json_correct($data['legenda']);
+        $subtitles[] = json_decode($legenda_json, true) ?: [];
     }
-    var_dump($data);
+
+    render_audio_and_legenda($audio_files, $subtitles);
+}
+
+function json_correct($json)
+{
+    return preg_replace('/(\w+):/i', '"$1":', str_replace("'", '"', $json));
+}
+
+function render_audio_and_legenda($audio_files, $subtitles)
+{
     foreach ($audio_files as $index => $audio_src) {
 ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
@@ -178,7 +134,7 @@ function return_acf_introduction_options($form_name = 'Form1')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const audioPlayers = document.querySelectorAll('audio');
-            const subtitles = <?php echo json_encode($subtitles); ?>;
+            const subtitles = <?= json_encode($subtitles) ?>;
             const legendaDivs = document.querySelectorAll('.legenda');
 
             function updateLegenda(index, currentTime) {
@@ -201,29 +157,28 @@ function return_acf_introduction_options($form_name = 'Form1')
             }
 
             audioPlayers.forEach((audio, index) => {
-                audio.addEventListener('play', function() {
-                    legendaDivs.forEach(div => div.style.display = 'none');
-                });
+                    audio.addEventListener('play', function() {
+                        legendaDivs.forEach(div => div.style.display = 'none');
+                    });
 
-                audio.addEventListener('timeupdate', function() {
-                    updateLegenda(index, audio.currentTime);
-                });
+                    audio.addEventListener('timeupdate', function() {
+                        updateLegenda(index, audio.currentTime);
+                    });
 
-                audio.addEventListener('ended', function() {
-                    audio.style.display = 'none';
-                    legendaDivs[index].style.display = 'none';
-                    const nextAudio = audioPlayers[index + 1];
-                    if (nextAudio) {
-                        nextAudio.style.display = 'block';
-                        nextAudio.play();
-                    }
-                });
+                    audio.addEventListener('ended', function() {
+                            audio.style.display = 'none';
+                            legendaDivs[index].style.display = 'none');
+                        const nextAudio = audioPlayers[index + 1];
+                        if (nextAudio) {
+                            nextAudio.style.display = 'block';
+                            nextAudio.play();
+                        }
+                    });
             });
 
-            // Start playing the first audio automatically
-            if (audioPlayers.length > 0) {
-                audioPlayers[0].play();
-            }
+        if (audioPlayers.length > 0) {
+            audioPlayers[0].play();
+        }
         });
     </script>
     <style>
