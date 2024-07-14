@@ -133,14 +133,27 @@ function return_acf_introduction_options($form_name = 'Form1')
         echo '<pre>';
         var_dump($data);
         echo '</pre>';
+        foreach ($nums_expressao as $option) {
+            $audio_files[] = $option['audio_expressao_'];
+            $legenda_json = $option['legenda_expressao_'];
+            echo '<pre>';
+            var_dump($option);
+            echo '</pre>';            // Correção do JSON: adicionar aspas duplas corretamente
+            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
+            $legenda = json_decode($legenda_json, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $subtitles[] = $legenda;
+            } else {
+                $subtitles[] = [];
+            }
+        }
 
         foreach ($nums_expressao as $option) {
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_files[] = $option['audio_expressao_'];
                 $legenda_json = $option['legenda_expressao_'];
-                echo '<pre>';
-                var_dump($option);
-                echo '</pre>';
+                var_dump($legenda_json);
                 // Correção do JSON: adicionar aspas duplas corretamente
                 $legenda_json = str_replace("'", '"', $legenda_json);
                 $legenda = json_decode($legenda_json, true);
