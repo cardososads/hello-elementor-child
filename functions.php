@@ -37,14 +37,14 @@ function process_elementor_form_submission($record, $handler)
             break;
         case 'Form2':
             $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
-            $form1_data = isset($_POST['formForm1_submission_data']) ? json_decode(stripslashes($_POST['formForm1_submission_data']), true) : null;
+            $form1_data = isset($_COOKIE['formForm1_submission_data']) ? json_decode(stripslashes($_COOKIE['formForm1_submission_data']), true) : null;
             if ($form1_data) {
                 $fields = array_merge($form1_data, $fields);
             }
             break;
         case 'Form3':
-            $form1_data = isset($_POST['formForm1_submission_data']) ? json_decode(stripslashes($_POST['formForm1_submission_data']), true) : null;
-            $form2_data = isset($_POST['formForm2_submission_data']) ? json_decode(stripslashes($_POST['formForm2_submission_data']), true) : null;
+            $form1_data = isset($_COOKIE['formForm1_submission_data']) ? json_decode(stripslashes($_COOKIE['formForm1_submission_data']), true) : null;
+            $form2_data = isset($_COOKIE['formForm2_submission_data']) ? json_decode(stripslashes($_COOKIE['formForm2_submission_data']), true) : null;
             if ($form1_data) {
                 $fields = array_merge($form1_data, $fields);
             }
@@ -53,6 +53,9 @@ function process_elementor_form_submission($record, $handler)
             }
             break;
     }
+
+    // Defina cookies com os dados do formulário processados
+    setcookie("form{$form_name}_submission_data", json_encode($fields), time() + 3600, "/");
 
     // Retorne os dados processados como resposta JSON
     wp_send_json_success($fields);
@@ -66,10 +69,10 @@ function forms_data($form)
 {
     // Verifique se o formulário é Form1, Form2 ou Form3
     if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
-        // Obtenha os dados do transient com base no nome do formulário
-        $form1_data = get_transient('formForm1_submission_data');
-        $form2_data = get_transient('formForm2_submission_data');
-        $form_data = get_transient('form' . $form . '_submission_data');
+        // Obtenha os dados dos cookies com base no nome do formulário
+        $form1_data = isset($_COOKIE['formForm1_submission_data']) ? json_decode(stripslashes($_COOKIE['formForm1_submission_data']), true) : null;
+        $form2_data = isset($_COOKIE['formForm2_submission_data']) ? json_decode(stripslashes($_COOKIE['formForm2_submission_data']), true) : null;
+        $form_data = isset($_COOKIE['form' . $form . '_submission_data']) ? json_decode(stripslashes($_COOKIE['form' . $form . '_submission_data']), true) : null;
 
         if ($form === 'Form2' && $form1_data) {
             $form_data = array_merge($form1_data, $form_data);
@@ -121,7 +124,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         echo '<div id="legenda_' . $index . '" class="legenda" ' . ($index > 0 ? 'style="display: none;"' : '') . '></div>';
     }
 
-    echo '<script>localStorage.setItem("subtitles", ' . json_encode($subtitles) . ');</script>';
+    echo '<script>document.cookie = "subtitles=" + JSON.stringify(' . json_encode($subtitles) . ');</script>';
 }
 
 // 6. Shortcode para Retornar as Opções de Introdução
@@ -164,8 +167,8 @@ add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
 
                 if (result.success) {
                     const formName = form.querySelector('input[name="form_name"]').value;
-                    localStorage.setItem(`form${formName}_submission_data`, JSON.stringify(result.data));
-                    alert('Formulário processado e dados armazenados no localStorage.');
+                    document.cookie = `form${formName}_submission_data=${JSON.stringify(result.data)};path=/;max-age=3600`;
+                    alert('Formulário processado e dados armazenados nos cookies.');
                 } else {
                     alert('Erro ao processar o formulário.');
                 }
@@ -186,7 +189,7 @@ add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
         const legendaDivs = document.querySelectorAll('.legenda');
 
         function updateLegenda(index, currentTime) {
-            const subtitles = JSON.parse(localStorage.getItem('subtitles'));
+            const subtitles = JSON.parse(getCookie('subtitles'));
             const legendasParaAudio = subtitles[index];
             const legendaDiv = legendaDivs[index];
             let displayed = false;
@@ -203,6 +206,23 @@ add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
             if (!displayed) {
                 legendaDiv.style.display = 'none';
             }
+        }
+
+        function getCookie(name) {
+            let dc = document.cookie;
+            let prefix = name + "=";
+            let begin = dc.indexOf("; " + prefix);
+            if (begin == -1) {
+                begin = dc.indexOf(prefix);
+                if (begin != 0) return null;
+            } else {
+                begin += 2;
+                let end = document.cookie.indexOf(";", begin);
+                if (end == -1) {
+                    end = dc.length;
+                }
+            }
+            return decodeURIComponent(dc.substring(begin + prefix.length, end));
         }
 
         audioPlayers.forEach((audio, index) => {
