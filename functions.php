@@ -250,3 +250,18 @@ function return_acf_introduction_options_shortcode($atts)
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
+?>
+
+
+function return_acf_introduction_options_shortcode($atts)
+{
+$atts = shortcode_atts(array(
+'form' => 'Form1',
+), $atts, 'return_players');
+
+ob_start();
+return_acf_introduction_options($atts['form']);
+return ob_get_clean();
+}
+
+add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
