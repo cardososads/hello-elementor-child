@@ -19,14 +19,6 @@ function start_session()
 }
 add_action('init', 'start_session', 1);
 
-// Limpa os dados dos formulários posteriores
-function clear_form1_data()
-{
-    unset($_SESSION['form1_data']);
-    unset($_SESSION['form2_data']);
-    unset($_SESSION['form3_data']);
-}
-
 // Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
@@ -34,11 +26,6 @@ function process_elementor_form_submission($record, $handler)
 {
     // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
-
-    // Se o formulário 1 for enviado, limpe os dados dos formulários anteriores
-    if ($form_name === 'Form1') {
-        clear_form1_data();
-    }
 
     // Obtenha os dados do formulário
     $fields = array_map(function ($field) {
@@ -74,6 +61,11 @@ function process_elementor_form_submission($record, $handler)
 
     // Atualiza os dados da sessão
     $_SESSION[strtolower($form_name) . '_data'] = $fields;
+
+    // Atualiza os dados no localStorage
+    echo '<script>
+        localStorage.setItem("' . strtolower($form_name) . '_data", ' . json_encode($fields) . ');
+    </script>';
 }
 
 // Função para obter os dados dos formulários
@@ -241,6 +233,21 @@ function return_acf_introduction_options($form_name = 'Form1')
             // Start playing the first audio automatically
             if (audioPlayers.length > 0) {
                 audioPlayers[0].play();
+            }
+        });
+
+        // Preencher o formulário com os dados do localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const formName = "<?php echo $form_name; ?>";
+            const formData = JSON.parse(localStorage.getItem(formName.toLowerCase() + '_data'));
+
+            if (formData) {
+                for (const [key, value] of Object.entries(formData)) {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        input.value = value;
+                    }
+                }
             }
         });
     </script>
