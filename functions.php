@@ -130,9 +130,9 @@ function return_acf_introduction_options($form_name = 'Form1')
         // Verifique o gênero e selecione o áudio e a legenda apropriados
         $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
         $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
-        echo '<pre>';
-        var_dump($expression_number);
-        echo '</pre>';
+        // echo '<pre>';
+        // var_dump($expression_number);
+        // echo '</pre>';
         foreach ($nums_expressao as $option) {
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_files[] = $option['audio_expressao_'];
@@ -151,7 +151,7 @@ function return_acf_introduction_options($form_name = 'Form1')
     } else if ($form_name === 'Form3') {
         $relationship_status = $data['relationship_status']; // Supondo que 'relationship_status' está disponível nos dados do formulário
         $motivation_number = $data['motivation_number']; // Supondo que 'motivation_number' está disponível nos dados do formulário
-        var_dump($motivation_number);
+        var_dump($data);
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['estado_civil_motivacao_'] == $relationship_status) {
                 $audio_files[] = $option['audio_motivacao_'];
