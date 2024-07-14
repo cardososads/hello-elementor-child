@@ -58,6 +58,9 @@ function process_elementor_form_submission($record, $handler)
             $_SESSION['form3_data'] = $fields;
             break;
     }
+
+    // Atualiza os dados da sessão
+    $_SESSION[strtolower($form_name) . '_data'] = $fields;
 }
 
 // Função para obter os dados dos formulários
@@ -94,7 +97,9 @@ function return_acf_introduction_options($form_name = 'Form1')
         foreach ($intros as $option) {
             $audio_files[] = $option['audio_de_introducao_'];
             $legenda_json = $option['legenda_de_introducao_'];
+            echo '<pre>';
             var_dump($data);
+            echo '</pre>';
             // Correção do JSON: adicionar aspas duplas corretamente
             $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
             $legenda = json_decode($legenda_json, true);
@@ -124,7 +129,9 @@ function return_acf_introduction_options($form_name = 'Form1')
     } else if ($form_name === 'Form2') {
         $gender = $data['gender'];
         $expression_number = $data['expression_number'];
+        echo '<pre>';
         var_dump($data);
+        echo '</pre>';
 
         $audio_file = '';
         $legenda_json = '';
@@ -151,7 +158,9 @@ function return_acf_introduction_options($form_name = 'Form1')
     } else if ($form_name === 'Form3') {
         $audio_files[] = $data['audio'];
         $legenda_json = $data['legenda'];
+        echo '<pre>';
         var_dump($data);
+        echo '</pre>';
 
         // Correção do JSON: adicionar aspas duplas corretamente
         $legenda_json = str_replace("'", '"', $legenda_json);
