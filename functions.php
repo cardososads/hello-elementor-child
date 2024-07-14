@@ -4,7 +4,7 @@ function hello_elementor_child_enqueue_styles()
     wp_enqueue_style('hello-elementor-style', get_template_directory_uri() . '/style.css');
     wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'));
 }
-add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
+add_action('wp_enqueue_scripts', 'hello-elementor_child_enqueue_styles');
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
 require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
@@ -56,7 +56,7 @@ function forms_data($form)
 ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const formData = JSON.parse(localStorage.getItem('<?= $form ?>'));
+            const formData = JSON.parse(localStorage.getItem('<?= $form ?>')) || {};
             console.log(formData);
         });
     </script>
@@ -87,16 +87,24 @@ function return_acf_introduction_options($form_name = 'Form1')
                     audio_files.push(option['audio_de_introducao_']);
                     let legenda_json = option['legenda_de_introducao_'];
                     legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
-                    let legenda = JSON.parse(legenda_json);
-                    subtitles.push(legenda);
+                    try {
+                        let legenda = JSON.parse(legenda_json);
+                        subtitles.push(legenda);
+                    } catch (e) {
+                        console.error('Erro ao parsear legenda JSON:', e);
+                    }
                 });
                 nums_destino.forEach(option => {
                     if (data.destiny_number == option['numero_destino_']) {
                         audio_files.push(option['audio_destino_']);
                         let legenda_json = option['legenda_destino_'];
                         legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
-                        let legenda = JSON.parse(legenda_json);
-                        subtitles.push(legenda);
+                        try {
+                            let legenda = JSON.parse(legenda_json);
+                            subtitles.push(legenda);
+                        } catch (e) {
+                            console.error('Erro ao parsear legenda JSON:', e);
+                        }
                     }
                 });
             } else if (formName === 'Form2') {
@@ -114,14 +122,22 @@ function return_acf_introduction_options($form_name = 'Form1')
 
                 audio_files.push(audio_file);
                 legenda_json = legenda_json.replace(/'/g, '"');
-                let legenda = JSON.parse(legenda_json);
-                subtitles.push(legenda);
+                try {
+                    let legenda = JSON.parse(legenda_json);
+                    subtitles.push(legenda);
+                } catch (e) {
+                    console.error('Erro ao parsear legenda JSON:', e);
+                }
             } else if (formName === 'Form3') {
                 audio_files.push(data['audio']);
                 let legenda_json = data['legenda'];
                 legenda_json = legenda_json.replace(/'/g, '"');
-                let legenda = JSON.parse(legenda_json);
-                subtitles.push(legenda);
+                try {
+                    let legenda = JSON.parse(legenda_json);
+                    subtitles.push(legenda);
+                } catch (e) {
+                    console.error('Erro ao parsear legenda JSON:', e);
+                }
             }
 
             audio_files.forEach((audio_src, index) => {
