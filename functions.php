@@ -155,6 +155,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             if ($motivation_number == $option['numero_motivacao_'] && $option['estado_civil_motivacao_'] == $relationship_status) {
                 $audio_files[] = $option['audio_motivacao_'];
                 $legenda_json = $option['legenda_motivacao_'];
+                print_r($option);
 
                 // Correção do JSON: adicionar aspas duplas corretamente
                 $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
