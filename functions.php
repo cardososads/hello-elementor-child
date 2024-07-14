@@ -94,10 +94,9 @@ function return_acf_introduction_options($form_name = 'Form1')
     $data = forms_data($form_name); // Use o nome do formulário passado como parâmetro
     $audio_files = [];
     $subtitles = [];
-
+    print_r($intros);
     if ($form_name === 'Form1') {
         foreach ($intros as $option) {
-            var_dump($intros);
             $audio_files[] = $option['audio_de_introducao_'];
             $legenda_json = $option['legenda_de_introducao_'];
 
