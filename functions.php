@@ -150,7 +150,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_files[] = $option['audio_expressao_'];
                 $legenda_json = $option['legenda_expressao_'];
-
+                var_dump($legenda_json);
                 // Correção do JSON: adicionar aspas duplas corretamente
                 $legenda_json = str_replace("'", '"', $legenda_json);
                 $legenda = json_decode($legenda_json, true);
