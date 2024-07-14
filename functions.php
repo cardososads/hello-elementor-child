@@ -20,14 +20,11 @@ function start_session()
 add_action('init', 'start_session', 1);
 
 // Limpa os dados dos formulários posteriores
-function clear_later_forms_data($form_name)
+function clear_form1_data()
 {
-    if ($form_name === 'Form1') {
-        unset($_SESSION['form2_data']);
-        unset($_SESSION['form3_data']);
-    } elseif ($form_name === 'Form2') {
-        unset($_SESSION['form3_data']);
-    }
+    unset($_SESSION['form1_data']);
+    unset($_SESSION['form2_data']);
+    unset($_SESSION['form3_data']);
 }
 
 // Hook para processar o envio dos formulários
@@ -38,8 +35,10 @@ function process_elementor_form_submission($record, $handler)
     // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
 
-    // Limpa os dados dos formulários posteriores
-    clear_later_forms_data($form_name);
+    // Se o formulário 1 for enviado, limpe os dados dos formulários anteriores
+    if ($form_name === 'Form1') {
+        clear_form1_data();
+    }
 
     // Obtenha os dados do formulário
     $fields = array_map(function ($field) {
