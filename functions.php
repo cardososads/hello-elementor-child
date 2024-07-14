@@ -160,6 +160,7 @@ add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
                 }
 
                 const result = await response.json();
+                console.log(result);
 
                 if (result.success) {
                     const formName = form.querySelector('input[name="form_name"]').value;
