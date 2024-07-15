@@ -314,7 +314,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         }
 
         #numero_destino_style.show {
-            display: block;
+            display: flex;
             width: 40% !important;
         }
 
