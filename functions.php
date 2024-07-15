@@ -98,7 +98,7 @@ function process_forms()
             'destiny_number' => $destiny_number
         ];
         // Redirecionar para a próxima página do formulário
-        wp_redirect(home_url('/form2'));
+        wp_redirect(home_url('/form-02'));
         exit();
     }
 
@@ -116,7 +116,7 @@ function process_forms()
             'expression_number' => $expression_number
         ];
         // Redirecionar para a próxima página do formulário
-        wp_redirect(home_url('/form3'));
+        wp_redirect(home_url('/form-03'));
         exit();
     }
 
@@ -134,7 +134,7 @@ function process_forms()
             'motivation_number' => $motivation_number
         ];
         // Redirecionar para a página final ou de resultados
-        wp_redirect(home_url('/resultados'));
+        wp_redirect(home_url('/pagina-de-conversao'));
         exit();
     }
 }
