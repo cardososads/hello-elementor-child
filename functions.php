@@ -39,9 +39,9 @@ function script_form()
                             jQuery(painelExecucao).fadeOut(1000, function() {
                                 setTimeout(function() {
                                     jQuery(secForm2).fadeIn(1000);
-                                }, 2000); // 2 segundos de atraso após fade-out
+                                }, 1000); // 1 segundos de atraso após fade-out
                             });
-                        }, 2000); // 2 segundos de atraso antes do fade-out
+                        }, 1000); // 1 segundos de atraso antes do fade-out
                     }
                 }
             }
