@@ -4,12 +4,6 @@ function hello_elementor_child_enqueue_styles()
 {
     // Enfileira o estilo principal do tema pai
     wp_enqueue_style('hello-elementor-style', get_template_directory_uri() . '/style.css');
-
-    // Enfileira o estilo do tema filho, que depende do estilo do tema pai
-    // wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'), '1.0');
-
-    // Enfileira o script customizado, que depende do jQuery e será carregado no footer
-    // wp_enqueue_script('functions_js', get_stylesheet_directory_uri() . '/js/functions.js', array('jquery'), '1.0', true);
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
@@ -61,8 +55,6 @@ function script_form()
             });
         });
     </script>
-
-
     <?php
 }
 add_action('wp_footer', 'script_form');
@@ -71,23 +63,16 @@ require get_stylesheet_directory() . '/inc/class-acf-options.php';
 require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
 require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
 
-// Hook para processar o envio dos formulários
 add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
 
 function process_elementor_form_submission($record, $handler)
 {
-    // Verifique qual formulário foi enviado
     $form_name = $record->get_form_settings('form_name');
-
-    // Obtenha os dados do formulário
     $fields = array_map(function ($field) {
         return $field['value'];
     }, $record->get('fields'));
-
-    // Instancia a classe de cálculo
     $calculator = new NumerologyCalculator();
 
-    // Processa os dados conforme o formulário enviado
     switch ($form_name) {
         case 'Form1':
             $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
@@ -112,16 +97,12 @@ function process_elementor_form_submission($record, $handler)
             break;
     }
 
-    // Armazena os dados do formulário usando transients para acesso global
     set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
-// Função para obter os dados dos formulários
 function forms_data($form)
 {
-    // Verifique se o formulário é Form1, Form2 ou Form3
     if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
-        // Obtenha os dados do transient com base no nome do formulário
         $form1_data = get_transient('formForm1_submission_data');
         $form2_data = get_transient('formForm2_submission_data');
         $form_data = get_transient('form' . $form . '_submission_data');
@@ -151,7 +132,7 @@ function return_acf_introduction_options($form_name = 'Form1')
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
     $nums_motivacao = ACFOptions::get_field('acf_numeros_de_motivacao');
-    $data = forms_data($form_name); // Use o nome do formulário passado como parâmetro
+    $data = forms_data($form_name);
     $audio_files = [];
     $subtitles = [];
 
@@ -159,8 +140,6 @@ function return_acf_introduction_options($form_name = 'Form1')
         foreach ($intros as $option) {
             $audio_files[] = $option['audio_de_introducao_'];
             $legenda_json = $option['legenda_de_introducao_'];
-
-            // Correção do JSON: adicionar aspas duplas corretamente
             $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
             $legenda = json_decode($legenda_json, true);
 
@@ -174,8 +153,6 @@ function return_acf_introduction_options($form_name = 'Form1')
             if ($data['destiny_number'] == $option['numero_destino_']) {
                 $audio_files[] = $option['audio_destino_'];
                 $legenda_json = $option['legenda_destino_'];
-
-                // Correção do JSON: adicionar aspas duplas corretamente
                 $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
                 $legenda = json_decode($legenda_json, true);
 
@@ -187,15 +164,13 @@ function return_acf_introduction_options($form_name = 'Form1')
             }
         }
     } else if ($form_name === 'Form2') {
-        // Verifique o gênero e selecione o áudio e a legenda apropriados
-        $gender = $data['gender']; // Supondo que 'gender' está disponível nos dados do formulário
-        $expression_number = $data['expression_number']; // Supondo que 'expression_number' está disponível nos dados do formulário
+        $gender = $data['gender'];
+        $expression_number = $data['expression_number'];
 
         foreach ($nums_expressao as $option) {
             if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
                 $audio_files[] = $option['audio_expressao_'];
                 $legenda_json = $option['legenda_expressao_'];
-
                 $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
                 $legenda = json_decode($legenda_json, true);
 
@@ -209,14 +184,12 @@ function return_acf_introduction_options($form_name = 'Form1')
     } else if ($form_name === 'Form3') {
         $calculator = new NumerologyCalculator();
         $motivation_number = $calculator->calculateMotivationNumber($data['full_name']);
-        $relationship_status = $data['marital_status']; // Supondo que 'marital_status' está disponível nos dados do formulário
+        $relationship_status = $data['marital_status'];
 
         foreach ($nums_motivacao as $option) {
             if ($motivation_number == $option['numero_motivacao_'] && $option['estado_civil_motivacao_'] == $relationship_status) {
                 $audio_files[] = $option['audio_motivacao_'];
                 $legenda_json = $option['legenda_motivacao_'];
-
-                // Correção do JSON: adicionar aspas duplas corretamente
                 $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
                 $legenda = json_decode($legenda_json, true);
 
@@ -281,17 +254,25 @@ function return_acf_introduction_options($form_name = 'Form1')
                 });
             });
 
-            // Start playing the first audio automatically
             if (audioPlayers.length > 0) {
                 audioPlayers[0].play();
             }
         });
     </script>
     <style>
+        audio {
+            width: 100px;
+            height: 50px;
+            margin: 0 auto;
+            display: block;
+        }
+
         .legenda {
             margin-top: 10px;
-            font-size: 14px;
-            color: #333;
+            font-size: 2em;
+            /* Tamanho de fonte equivalente a h2 */
+            color: white;
+            text-align: center;
         }
     </style>
 <?php
