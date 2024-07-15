@@ -107,6 +107,8 @@ add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission'
 
 function process_elementor_form_submission($record, $handler)
 {
+    header('Content-Type: application/json; charset=utf-8');
+
     $form_name = $record->get_form_settings('form_name');
     $fields = array_map(function ($field) {
         return $field['value'];
@@ -125,16 +127,7 @@ function process_elementor_form_submission($record, $handler)
             break;
     }
 
-    // Passe os dados do formulário para o JavaScript
-    echo '<script type="text/javascript">
-        try {
-            var formData = ' . json_encode($fields, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ';
-            console.log("Form Submission: ' . $form_name . '", formData);
-            localStorage.setItem("' . $form_name . '_data", JSON.stringify(formData));
-        } catch (e) {
-            console.error("JSON Encode Error:", e);
-        }
-    </script>';
+    echo json_encode($fields, JSON_UNESCAPED_UNICODE);
 }
 
 function return_acf_introduction_options($form_name = 'Form1')
