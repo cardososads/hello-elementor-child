@@ -21,23 +21,28 @@ function script_form()
             var painelExecucao = document.getElementById('painel_execucao');
             var secForm2 = document.getElementById('sec_form_2');
             var playersContainer = document.getElementById('players');
-            var players = playersContainer.querySelectorAll('audio');
+            var players = playersContainer ? playersContainer.querySelectorAll('audio') : [];
             var playersFinished = 0;
 
-            // Oculta o painel_execucao e o sec_form_2 inicialmente
-            if (painelExecucao) {
-                painelExecucao.style.display = 'none';
-            }
+            // Oculta sec_form_2 inicialmente
             if (secForm2) {
                 secForm2.style.display = 'none';
+            }
+
+            // Exibe painel_execucao com fade-in no carregamento da página
+            if (painelExecucao) {
+                jQuery(painelExecucao).fadeIn(1000);
             }
 
             // Função para verificar se todos os players terminaram
             function checkPlayers() {
                 if (playersFinished === players.length) {
                     // Todos os players terminaram
-                    jQuery(painelExecucao).fadeIn(1000);
-                    jQuery(secForm2).fadeIn(1000);
+                    if (painelExecucao && secForm2) {
+                        jQuery(painelExecucao).fadeOut(1000, function() {
+                            jQuery(secForm2).fadeIn(1000);
+                        });
+                    }
                 }
             }
 
@@ -50,6 +55,7 @@ function script_form()
             });
         });
     </script>
+
     <?php
 }
 add_action('wp_footer', 'script_form');
