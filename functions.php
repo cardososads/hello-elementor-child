@@ -15,12 +15,16 @@ function script_form()
             var painelExecucao = document.querySelector('.painel_execucao');
             var secForm = document.querySelector('.sec_form');
             var playersContainer = document.querySelector('.players');
+            var numeroDestinoStyle = document.getElementById('numero_destino_style');
             var players = playersContainer ? playersContainer.querySelectorAll('audio') : [];
             var playersFinished = 0;
 
-            // Oculta sec_form inicialmente
+            // Oculta sec_form e numero_destino_style inicialmente
             if (secForm) {
                 secForm.style.display = 'none';
+            }
+            if (numeroDestinoStyle) {
+                numeroDestinoStyle.style.display = 'none';
             }
 
             // Exibe painel_execucao com fade-in no carregamento da página
@@ -56,30 +60,12 @@ function script_form()
                     player.addEventListener('play', function() {
                         if (numeroDestinoStyle) {
                             numeroDestinoStyle.style.display = 'block';
-                            numeroDestinoStyle.classList.add('zoom-in');
                         }
                     });
                 }
             });
         });
     </script>
-
-    <style>
-        @keyframes zoomIn {
-            from {
-                transform: scale(0);
-            }
-
-            to {
-                transform: scale(1);
-            }
-        }
-
-        .zoom-in {
-            animation: zoomIn 1s ease-in-out;
-        }
-    </style>
-
     <?php
 }
 add_action('wp_footer', 'script_form');
