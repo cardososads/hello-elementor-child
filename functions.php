@@ -17,13 +17,13 @@ function script_form()
 {
 ?>
     <script type="text/javascript">
-        console.log("Aqui!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         document.addEventListener('DOMContentLoaded', function() {
             var painelExecucao = document.getElementById('painel_execucao');
             var secForm2 = document.getElementById('sec_form_2');
-            var players = document.querySelectorAll('#audio_player_0, #audio_player_1, #audio_player_2'); // Seleciona todos os players de áudio e vídeo dentro do painel_execucao
+            var playersContainer = document.getElementById('players');
+            var players = playersContainer.querySelectorAll('audio');
             var playersFinished = 0;
-
+            console.log(players)
             // Oculta o painel_execucao inicialmente
             painelExecucao.style.display = 'none';
 
@@ -48,7 +48,6 @@ function script_form()
     </script>
     <?php
 }
-
 add_action('wp_footer', 'script_form');
 
 
