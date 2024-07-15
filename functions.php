@@ -261,7 +261,7 @@ function return_acf_introduction_options($form_name = 'Form1')
     </script>
     <style>
         audio {
-            width: 100px;
+            width: 80%;
             height: 50px;
             margin: 0 auto;
             display: block;
@@ -269,7 +269,7 @@ function return_acf_introduction_options($form_name = 'Form1')
 
         .legenda {
             margin-top: 10px;
-            font-size: 2em;
+            font-size: 1.3em;
             /* Tamanho de fonte equivalente a h2 */
             color: white;
             text-align: center;
