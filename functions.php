@@ -19,12 +19,14 @@ function script_form()
             var players = playersContainer ? playersContainer.querySelectorAll('audio') : [];
             var playersFinished = 0;
 
-            // Oculta sec_form e numero_destino_style inicialmente
+            // Oculta sec_form inicialmente
             if (secForm) {
                 secForm.style.display = 'none';
             }
+            // Oculta numero_destino_style inicialmente
             if (numeroDestinoStyle) {
                 numeroDestinoStyle.style.display = 'none';
+                numeroDestinoStyle.style.width = '0';
             }
 
             // Exibe painel_execucao com fade-in no carregamento da página
@@ -60,6 +62,9 @@ function script_form()
                     player.addEventListener('play', function() {
                         if (numeroDestinoStyle) {
                             numeroDestinoStyle.style.display = 'block';
+                            setTimeout(function() {
+                                numeroDestinoStyle.classList.add('show');
+                            }, 0); // Adiciona a classe show para aplicar a transição
                         }
                     });
                 }
@@ -284,6 +289,19 @@ function return_acf_introduction_options($form_name = 'Form1')
             /* Tamanho de fonte equivalente a h2 */
             color: white;
             text-align: center;
+        }
+
+        #numero_destino_style {
+            display: none;
+            /* Escondido inicialmente */
+            width: 0;
+            transition: width 1s ease-in-out;
+            /* Transição suave para a largura */
+        }
+
+        #numero_destino_style.show {
+            display: block;
+            width: 40%;
         }
     </style>
 <?php
