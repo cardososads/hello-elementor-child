@@ -26,7 +26,7 @@ function script_form()
 
             // Oculta o painel_execucao e o sec_form_2 inicialmente
             if (painelExecucao) {
-                painelExecucao.style.display = 'visible';
+                painelExecucao.style.display = 'none';
             }
             if (secForm2) {
                 secForm2.style.display = 'none';
@@ -36,8 +36,9 @@ function script_form()
             function checkPlayers() {
                 if (playersFinished === players.length) {
                     // Todos os players terminaram
-                    jQuery(painelExecucao).fadeOut(1000);
-                    jQuery(secForm2).fadeIn(1000);
+                    jQuery(painelExecucao).fadeOut(1000, function() {
+                        jQuery(secForm2).fadeIn(1000);
+                    });
                 }
             }
 
