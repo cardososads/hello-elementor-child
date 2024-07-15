@@ -320,7 +320,6 @@ function return_acf_introduction_options($form_name = 'Form1')
         }
 
         #sol {
-            display: none;
             /* Escondido inicialmente */
             width: 50% !important;
             /* Largura inicial maior */
