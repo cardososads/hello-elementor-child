@@ -294,7 +294,6 @@ function return_acf_introduction_options($form_name = 'Form1')
         #numero_destino_style {
             display: none;
             /* Escondido inicialmente */
-            width: 0;
             transition: width 1s ease-in-out;
             /* Transição suave para a largura */
         }
