@@ -372,3 +372,61 @@ function render_form3()
     return ob_get_clean();
 }
 add_shortcode('form3', 'render_form3');
+
+function process_forms()
+{
+    if (isset($_POST['submit_form1'])) {
+        $first_name = sanitize_text_field($_POST['first_name']);
+        $birth_date = sanitize_text_field($_POST['birth_date']);
+        // Calcular o número de destino
+        $calculator = new NumerologyCalculator();
+        $destiny_number = $calculator->calculateDestinyNumber($birth_date);
+        // Armazenar os dados na sessão
+        session_start();
+        $_SESSION['form1_data'] = [
+            'first_name' => $first_name,
+            'birth_date' => $birth_date,
+            'destiny_number' => $destiny_number
+        ];
+        // Redirecionar para a próxima página do formulário
+        wp_redirect(home_url('/form2'));
+        exit();
+    }
+
+    if (isset($_POST['submit_form2'])) {
+        $gender = sanitize_text_field($_POST['gender']);
+        $full_name = sanitize_text_field($_POST['full_name']);
+        // Calcular o número de expressão
+        $calculator = new NumerologyCalculator();
+        $expression_number = $calculator->calculateExpressionNumber($full_name);
+        // Armazenar os dados na sessão
+        session_start();
+        $_SESSION['form2_data'] = [
+            'gender' => $gender,
+            'full_name' => $full_name,
+            'expression_number' => $expression_number
+        ];
+        // Redirecionar para a próxima página do formulário
+        wp_redirect(home_url('/form3'));
+        exit();
+    }
+
+    if (isset($_POST['submit_form3'])) {
+        $email = sanitize_email($_POST['email']);
+        $marital_status = sanitize_text_field($_POST['marital_status']);
+        // Calcular o número de motivação
+        $calculator = new NumerologyCalculator();
+        $motivation_number = $calculator->calculateMotivationNumber($_SESSION['form2_data']['full_name']);
+        // Armazenar os dados na sessão
+        session_start();
+        $_SESSION['form3_data'] = [
+            'email' => $email,
+            'marital_status' => $marital_status,
+            'motivation_number' => $motivation_number
+        ];
+        // Redirecionar para a página final ou de resultados
+        wp_redirect(home_url('/resultados'));
+        exit();
+    }
+}
+add_action('init', 'process_forms');
