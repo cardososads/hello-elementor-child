@@ -26,7 +26,7 @@ function script_form()
             // Oculta numero_destino_style inicialmente
             if (numeroDestinoStyle) {
                 numeroDestinoStyle.style.display = 'none';
-                numeroDestinoStyle.style.width = '0';
+                numeroDestinoStyle.style.opacity = '0';
             }
 
             // Exibe painel_execucao com fade-in no carregamento da página
@@ -296,14 +296,16 @@ function return_acf_introduction_options($form_name = 'Form1')
         #numero_destino_style {
             display: none;
             /* Escondido inicialmente */
-            width: 0;
-            transition: width 1s ease-in-out;
-            /* Transição suave para a largura */
+            opacity: 0;
+            width: 40%;
+            /* Largura final desejada */
+            transition: opacity 1s ease-in-out;
+            /* Transição suave para a opacidade */
         }
 
         #numero_destino_style.show {
             display: block;
-            width: 40%;
+            opacity: 1;
         }
     </style>
 <?php
