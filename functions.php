@@ -13,6 +13,43 @@ function hello_elementor_child_enqueue_styles()
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
+function script_form()
+{
+?>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var painelExecucao = document.getElementById('painel_execucao');
+            var secForm2 = document.getElementById('sec_form_2');
+            var players = document.querySelectorAll('#painel_execucao audio, #painel_execucao video'); // Seleciona todos os players de áudio e vídeo dentro do painel_execucao
+            var playersFinished = 0;
+
+            // Oculta o painel_execucao inicialmente
+            painelExecucao.style.display = 'none';
+
+            // Função para verificar se todos os players terminaram
+            function checkPlayers() {
+                if (playersFinished === players.length) {
+                    // Todos os players terminaram
+                    jQuery(secForm2).fadeOut(1000, function() {
+                        jQuery(painelExecucao).fadeIn(1000);
+                    });
+                }
+            }
+
+            // Adiciona eventos de término aos players
+            players.forEach(function(player) {
+                player.addEventListener('ended', function() {
+                    playersFinished++;
+                    checkPlayers();
+                });
+            });
+        });
+    </script>
+    <?php
+}
+
+add_action('wp_footer', 'script_form');
+
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
 require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
@@ -177,7 +214,7 @@ function return_acf_introduction_options($form_name = 'Form1')
     }
 
     foreach ($audio_files as $index => $audio_src) {
-?>
+    ?>
         <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
         <div id="legenda_<?= $index ?>" class="legenda" style="display: none;"></div>
     <?php
