@@ -6,11 +6,50 @@ function hello_elementor_child_enqueue_styles()
     wp_enqueue_style('hello-elementor-style', get_template_directory_uri() . '/style.css');
 
     // Enfileira o estilo do tema filho, que depende do estilo do tema pai
-    // wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'), '1.0');
+    wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'), '1.0');
 
-    // Enfileira o script customizado, que depende do jQuery e será carregado no footer
-    // wp_enqueue_script('functions_js', get_stylesheet_directory_uri() . '/js/functions.js', array('jquery'), '1.0', true);
+    // Enfileira o script jQuery, se ainda não estiver enfileirado
+    if (!wp_script_is('jquery', 'enqueued')) {
+        wp_enqueue_script('jquery');
+    }
+
+    // Enfileira o script customizado
+    wp_enqueue_script('functions_js', '', array('jquery'), '1.0', true);
+
+    // Adiciona o código JavaScript inline
+    $custom_js = "
+    document.addEventListener('DOMContentLoaded', function () {
+        var painelExecucao = document.getElementById('painel_execucao');
+        var secForm2 = document.getElementById('sec_form_2');
+        var players = document.querySelectorAll('#painel_execucao audio, #painel_execucao video'); // Seleciona todos os players de áudio e vídeo dentro do painel_execucao
+        var playersFinished = 0;
+
+        // Oculta o painel_execucao inicialmente
+        painelExecucao.style.display = 'none';
+
+        // Função para verificar se todos os players terminaram
+        function checkPlayers() {
+            if (playersFinished === players.length) {
+                // Todos os players terminaram
+                jQuery(secForm2).fadeOut(1000, function() {
+                    jQuery(painelExecucao).fadeIn(1000);
+                });
+            }
+        }
+
+        // Adiciona eventos de término aos players
+        players.forEach(function(player) {
+            player.addEventListener('ended', function() {
+                playersFinished++;
+                checkPlayers();
+            });
+        });
+    });
+    ";
+    wp_add_inline_script('functions_js', $custom_js);
 }
+add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
+
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
 
