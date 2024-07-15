@@ -21,7 +21,7 @@ function script_form()
         document.addEventListener('DOMContentLoaded', function() {
             var painelExecucao = document.getElementById('painel_execucao');
             var secForm2 = document.getElementById('sec_form_2');
-            var players = document.querySelectorAll('.audio_player_0, audio_player_1, audio_player_2'); // Seleciona todos os players de áudio e vídeo dentro do painel_execucao
+            var players = document.querySelectorAll('#audio_player_0, #audio_player_1, #audio_player_2'); // Seleciona todos os players de áudio e vídeo dentro do painel_execucao
             var playersFinished = 0;
 
             // Oculta o painel_execucao inicialmente
