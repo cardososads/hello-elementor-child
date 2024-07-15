@@ -301,6 +301,10 @@ function return_acf_introduction_options($form_name = 'Form1')
             text-align: center;
         }
 
+        .num_dest{
+            color: white;
+        }
+
         #numero_destino_style {
             display: none;
             /* Escondido inicialmente */
