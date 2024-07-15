@@ -36,9 +36,8 @@ function script_form()
             function checkPlayers() {
                 if (playersFinished === players.length) {
                     // Todos os players terminaram
-                    jQuery(painelExecucao).fadeOut(1000, function() {
-                        jQuery(secForm2).fadeIn(1000);
-                    });
+                    jQuery(painelExecucao).fadeIn(1000);
+                    jQuery(secForm2).fadeIn(1000);
                 }
             }
 
