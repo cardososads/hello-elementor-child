@@ -127,9 +127,13 @@ function process_elementor_form_submission($record, $handler)
 
     // Passe os dados do formulário para o JavaScript
     echo '<script type="text/javascript">
-        console.log("Form Submission: ' . $form_name . '", ' . json_encode($fields) . ');
-        var formData = ' . json_encode($fields) . ';
-        localStorage.setItem("' . $form_name . '_data", JSON.stringify(formData));
+        try {
+            var formData = ' . json_encode($fields, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ';
+            console.log("Form Submission: ' . $form_name . '", formData);
+            localStorage.setItem("' . $form_name . '_data", JSON.stringify(formData));
+        } catch (e) {
+            console.error("JSON Encode Error:", e);
+        }
     </script>';
 }
 
