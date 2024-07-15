@@ -15,7 +15,7 @@ function hello_elementor_child_enqueue_styles()
     wp_enqueue_style('hello-elementor-child-style', $child_style, array('hello-elementor-style'), '1.0');
 
     // Enfileira o script customizado, que depende do jQuery e será carregado no footer
-    wp_enqueue_script('functions_js', get_stylesheet_directory_uri() . '/functions.js', array('jquery'), '1.0', true);
+    wp_enqueue_script('functions_js', get_stylesheet_directory_uri() . '/js/functions.js', array('jquery'), '1.0', true);
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
