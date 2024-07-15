@@ -15,12 +15,16 @@ function script_form()
             var painelExecucao = document.querySelector('.painel_execucao');
             var secForm = document.querySelector('.sec_form');
             var playersContainer = document.querySelector('.players');
+            var numeroDestinoStyle = document.getElementById('numero_destino_style');
             var players = playersContainer ? playersContainer.querySelectorAll('audio') : [];
             var playersFinished = 0;
 
-            // Oculta sec_form inicialmente
+            // Oculta sec_form e numero_destino_style inicialmente
             if (secForm) {
                 secForm.style.display = 'none';
+            }
+            if (numeroDestinoStyle) {
+                numeroDestinoStyle.style.display = 'none';
             }
 
             // Exibe painel_execucao com fade-in no carregamento da página
@@ -46,12 +50,19 @@ function script_form()
                 }
             }
 
-            // Adiciona eventos de término aos players
-            players.forEach(function(player) {
+            // Adiciona eventos de término e início aos players
+            players.forEach(function(player, index) {
                 player.addEventListener('ended', function() {
                     playersFinished++;
                     checkPlayers();
                 });
+                if (index === players.length - 1) {
+                    player.addEventListener('play', function() {
+                        if (numeroDestinoStyle) {
+                            numeroDestinoStyle.style.display = 'block';
+                        }
+                    });
+                }
             });
         });
     </script>
