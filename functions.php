@@ -89,7 +89,7 @@ function script_form()
             });
         });
     </script>
-    <?php
+<?php
 }
 add_action('wp_footer', 'script_form');
 
@@ -110,55 +110,20 @@ function process_elementor_form_submission($record, $handler)
     switch ($form_name) {
         case 'Form1':
             $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
-            $_SESSION['formForm1_submission_data'] = $fields;
             break;
         case 'Form2':
             $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
-            $form1_data = isset($_SESSION['formForm1_submission_data']) ? $_SESSION['formForm1_submission_data'] : [];
-            if ($form1_data) {
-                $fields = array_merge($form1_data, $fields);
-            }
-            $_SESSION['formForm2_submission_data'] = $fields;
             break;
         case 'Form3':
             $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
-            $form1_data = isset($_SESSION['formForm1_submission_data']) ? $_SESSION['formForm1_submission_data'] : [];
-            $form2_data = isset($_SESSION['formForm2_submission_data']) ? $_SESSION['formForm2_submission_data'] : [];
-            if ($form1_data) {
-                $fields = array_merge($form1_data, $fields);
-            }
-            if ($form2_data) {
-                $fields = array_merge($form2_data, $fields);
-            }
-            $_SESSION['formForm3_submission_data'] = $fields;
             break;
     }
-}
 
-function forms_data($form)
-{
-    if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
-        $form1_data = isset($_SESSION['formForm1_submission_data']) ? $_SESSION['formForm1_submission_data'] : [];
-        $form2_data = isset($_SESSION['formForm2_submission_data']) ? $_SESSION['formForm2_submission_data'] : [];
-        $form_data = isset($_SESSION['form' . $form . '_submission_data']) ? $_SESSION['form' . $form . '_submission_data'] : [];
-
-        if ($form === 'Form2' && $form1_data) {
-            $form_data = array_merge($form1_data, $form_data);
-        }
-
-        if ($form === 'Form3') {
-            if ($form1_data) {
-                $form_data = array_merge($form1_data, $form_data);
-            }
-            if ($form2_data) {
-                $form_data = array_merge($form2_data, $form_data);
-            }
-        }
-
-        return $form_data;
-    }
-
-    return null;
+    // Passe os dados do formulário para o JavaScript
+    echo '<script type="text/javascript">
+        var formData = ' . json_encode($fields) . ';
+        localStorage.setItem("' . $form_name . '_data", JSON.stringify(formData));
+    </script>';
 }
 
 function return_acf_introduction_options($form_name = 'Form1')
@@ -167,75 +132,94 @@ function return_acf_introduction_options($form_name = 'Form1')
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
     $nums_expressao = ACFOptions::get_field('acf_numeros_de_expressao');
     $nums_motivacao = ACFOptions::get_field('acf_numeros_de_motivacao');
-    $data = forms_data($form_name);
-    $audio_files = [];
-    $subtitles = [];
+?>
+    <script type="text/javascript">
+        var form1_data = JSON.parse(localStorage.getItem('Form1_data') || '{}');
+        var form2_data = JSON.parse(localStorage.getItem('Form2_data') || '{}');
+        var form3_data = JSON.parse(localStorage.getItem('Form3_data') || '{}');
+        var form_data = {};
 
-    if ($form_name === 'Form1') {
-        foreach ($intros as $option) {
-            $audio_files[] = $option['audio_de_introducao_'];
-            $legenda_json = $option['legenda_de_introducao_'];
-            $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-            $legenda = json_decode($legenda_json, true);
-
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $subtitles[] = $legenda;
-            } else {
-                $subtitles[] = [];
-            }
+        switch ('<?= $form_name ?>') {
+            case 'Form1':
+                form_data = form1_data;
+                break;
+            case 'Form2':
+                form_data = Object.assign({}, form1_data, form2_data);
+                break;
+            case 'Form3':
+                form_data = Object.assign({}, form1_data, form2_data, form3_data);
+                break;
         }
-        foreach ($nums_destino as $option) {
-            if ($data['destiny_number'] == $option['numero_destino_']) {
-                $audio_files[] = $option['audio_destino_'];
-                $legenda_json = $option['legenda_destino_'];
-                $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-                $legenda = json_decode($legenda_json, true);
 
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $subtitles[] = $legenda;
+        localStorage.setItem('<?= $form_name ?>_final_data', JSON.stringify(form_data));
+
+        var audio_files = [];
+        var subtitles = [];
+
+        <?php if ($form_name === 'Form1') : ?>
+            <?php foreach ($intros as $option) : ?>
+                audio_files.push('<?= $option['audio_de_introducao_'] ?>');
+                var legenda_json = '<?= addslashes($option['legenda_de_introducao_']) ?>';
+                legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
+                var legenda = JSON.parse(legenda_json);
+
+                if (legenda) {
+                    subtitles.push(legenda);
                 } else {
-                    $subtitles[] = [];
+                    subtitles.push([]);
                 }
-            }
-        }
-    } else if ($form_name === 'Form2') {
-        $gender = $data['gender'];
-        $expression_number = $data['expression_number'];
+            <?php endforeach; ?>
+            <?php foreach ($nums_destino as $option) : ?>
+                if (form_data['destiny_number'] == <?= $option['numero_destino_'] ?>) {
+                    audio_files.push('<?= $option['audio_destino_'] ?>');
+                    var legenda_json = '<?= addslashes($option['legenda_destino_']) ?>';
+                    legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
+                    var legenda = JSON.parse(legenda_json);
 
-        foreach ($nums_expressao as $option) {
-            if ($expression_number == $option['numero_expressao_'] && $option['genero_expressao_'] == $gender) {
-                $audio_files[] = $option['audio_expressao_'];
-                $legenda_json = $option['legenda_expressao_'];
-                $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-                $legenda = json_decode($legenda_json, true);
-
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $subtitles[] = $legenda;
-                } else {
-                    $subtitles[] = [];
+                    if (legenda) {
+                        subtitles.push(legenda);
+                    } else {
+                        subtitles.push([]);
+                    }
                 }
-            }
-        }
-    } else if ($form_name === 'Form3') {
-        $calculator = new NumerologyCalculator();
-        $motivation_number = $calculator->calculateMotivationNumber($data['full_name']);
-        $relationship_status = $data['marital_status'];
+            <?php endforeach; ?>
+        <?php elseif ($form_name === 'Form2') : ?>
+            var gender = form_data['gender'];
+            var expression_number = form_data['expression_number'];
+            <?php foreach ($nums_expressao as $option) : ?>
+                if (expression_number == <?= $option['numero_expressao_'] ?> && gender == '<?= $option['genero_expressao_'] ?>') {
+                    audio_files.push('<?= $option['audio_expressao_'] ?>');
+                    var legenda_json = '<?= addslashes($option['legenda_expressao_']) ?>';
+                    legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
+                    var legenda = JSON.parse(legenda_json);
 
-        foreach ($nums_motivacao as $option) {
-            if ($motivation_number == $option['numero_motivacao_'] && $option['estado_civil_motivacao_'] == $relationship_status) {
-                $audio_files[] = $option['audio_motivacao_'];
-                $legenda_json = $option['legenda_motivacao_'];
-                $legenda_json = preg_replace('/(\w+):/i', '"$1":', $legenda_json);
-                $legenda = json_decode($legenda_json, true);
-
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $subtitles[] = $legenda;
-                } else {
-                    $subtitles[] = [];
+                    if (legenda) {
+                        subtitles.push(legenda);
+                    } else {
+                        subtitles.push([]);
+                    }
                 }
-            }
-        }
-    }
+            <?php endforeach; ?>
+        <?php elseif ($form_name === 'Form3') : ?>
+            var motivation_number = form_data['motivation_number'];
+            var relationship_status = form_data['marital_status'];
+            <?php foreach ($nums_motivacao as $option) : ?>
+                if (motivation_number == <?= $option['numero_motivacao_'] ?> && relationship_status == '<?= $option['estado_civil_motivacao_'] ?>') {
+                    audio_files.push('<?= $option['audio_motivacao_'] ?>');
+                    var legenda_json = '<?= addslashes($option['legenda_motivacao_']) ?>';
+                    legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
+                    var legenda = JSON.parse(legenda_json);
+
+                    if (legenda) {
+                        subtitles.push(legenda);
+                    } else {
+                        subtitles.push([]);
+                    }
+                }
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </script>
+    <?php
 
     foreach ($audio_files as $index => $audio_src) {
     ?>
@@ -356,26 +340,13 @@ add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
 
 function get_destiny_number()
 {
-    $form1_data = isset($_SESSION['formForm1_submission_data']) ? $_SESSION['formForm1_submission_data'] : [];
-    if ($form1_data && isset($form1_data['birth_date'])) {
-        $calculator = new NumerologyCalculator();
-        $destiny_number = $calculator->calculateDestinyNumber($form1_data['birth_date']);
-        return $destiny_number;
-    }
-    return 'No destiny number found';
+?>
+    <script type="text/javascript">
+        var form1_data = JSON.parse(localStorage.getItem('Form1_final_data') || '{}');
+        var destiny_number = form1_data['destiny_number'] || 'No destiny number found';
+        document.write('<p class="num_destino">' + destiny_number + '</p>');
+    </script>
+<?php
 }
 
-function return_destiny_number_shortcode()
-{
-    $destiny_number = get_destiny_number();
-    echo '<p class="num_destino">' . $destiny_number . '</p>';
-}
-
-add_shortcode('destiny_number', 'return_destiny_number_shortcode');
-
-function end_session()
-{
-    session_destroy();
-}
-add_action('wp_logout', 'end_session');
-add_action('wp_login', 'end_session');
+add_shortcode('destiny_number', 'get_destiny_number');
