@@ -314,3 +314,61 @@ function get_destiny_number()
 }
 
 add_shortcode('destiny_number', 'get_destiny_number');
+
+
+function render_form1()
+{
+    ob_start();
+?>
+    <form id="form1" method="post">
+        <label for="first_name">Primeiro Nome:</label>
+        <input type="text" id="first_name" name="first_name" required>
+        <label for="birth_date">Data de Nascimento:</label>
+        <input type="date" id="birth_date" name="birth_date" required>
+        <input type="submit" name="submit_form1" value="Enviar">
+    </form>
+<?php
+    return ob_get_clean();
+}
+add_shortcode('form1', 'render_form1');
+
+function render_form2()
+{
+    ob_start();
+?>
+    <form id="form2" method="post">
+        <label for="gender">Gênero:</label>
+        <select id="gender" name="gender" required>
+            <option value="male">Masculino</option>
+            <option value="female">Feminino</option>
+            <option value="other">Outro</option>
+        </select>
+        <label for="full_name">Nome Completo de Nascimento:</label>
+        <input type="text" id="full_name" name="full_name" required>
+        <input type="submit" name="submit_form2" value="Enviar">
+    </form>
+<?php
+    return ob_get_clean();
+}
+add_shortcode('form2', 'render_form2');
+
+function render_form3()
+{
+    ob_start();
+?>
+    <form id="form3" method="post">
+        <label for="email">Endereço de Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="marital_status">Estado Civil:</label>
+        <select id="marital_status" name="marital_status" required>
+            <option value="single">Solteiro(a)</option>
+            <option value="married">Casado(a)</option>
+            <option value="divorced">Divorciado(a)</option>
+            <option value="widowed">Viúvo(a)</option>
+        </select>
+        <input type="submit" name="submit_form3" value="Enviar">
+    </form>
+<?php
+    return ob_get_clean();
+}
+add_shortcode('form3', 'render_form3');
