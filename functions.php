@@ -2,22 +2,17 @@
 
 function hello_elementor_child_enqueue_styles()
 {
-    // Caminho absoluto do tema pai
-    $parent_style = get_template_directory_uri() . '/style.css';
-
-    // Caminho absoluto do tema filho
-    $child_style = get_stylesheet_directory_uri() . '/style.css';
-
     // Enfileira o estilo principal do tema pai
-    wp_enqueue_style('hello-elementor-style', $parent_style);
+    wp_enqueue_style('hello-elementor-style', get_template_directory_uri() . '/style.css');
 
     // Enfileira o estilo do tema filho, que depende do estilo do tema pai
-    wp_enqueue_style('hello-elementor-child-style', $child_style, array('hello-elementor-style'), '1.0');
+    wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'), '1.0');
 
     // Enfileira o script customizado, que depende do jQuery e será carregado no footer
     wp_enqueue_script('functions_js', get_stylesheet_directory_uri() . '/js/functions.js', array('jquery'), '1.0', true);
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
+
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
 require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
