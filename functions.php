@@ -62,9 +62,11 @@ function script_form()
                     player.addEventListener('play', function() {
                         if (numeroDestinoStyle) {
                             numeroDestinoStyle.style.display = 'block';
+                            // Adiciona um pequeno atraso antes de adicionar a classe para garantir que a transição seja aplicada
                             setTimeout(function() {
+                                console.log('Adicionando classe show ao numeroDestinoStyle');
                                 numeroDestinoStyle.classList.add('show');
-                            }, 0); // Adiciona a classe show para aplicar a transição
+                            }, 50); // Atraso de 50ms
                         }
                     });
                 }
@@ -294,6 +296,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         #numero_destino_style {
             display: none;
             /* Escondido inicialmente */
+            width: 0;
             transition: width 1s ease-in-out;
             /* Transição suave para a largura */
         }
