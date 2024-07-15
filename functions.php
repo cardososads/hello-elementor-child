@@ -1,5 +1,9 @@
 <?php
 
+require get_stylesheet_directory() . '/inc/class-acf-options.php';
+require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
+require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
+
 function hello_elementor_child_enqueue_styles()
 {
     // Enfileira o estilo principal do tema pai
@@ -21,13 +25,11 @@ function start_session()
 }
 add_action('init', 'start_session', 1);
 
-require get_stylesheet_directory() . '/inc/class-acf-options.php';
-require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
-require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
-
 function render_form1()
 {
     ob_start();
+    $form1_data = isset($_SESSION['form1_data']) ? $_SESSION['form1_data'] : [];
+    echo '<pre>' . var_dump($form1_data) . '</pre>';
 ?>
     <form id="form1" method="post">
         <label for="first_name">Primeiro Nome:</label>
@@ -44,6 +46,8 @@ add_shortcode('form1', 'render_form1');
 function render_form2()
 {
     ob_start();
+    $form1_data = isset($_SESSION['form1_data']) ? $_SESSION['form1_data'] : [];
+    echo '<pre>' . var_dump($form1_data) . '</pre>';
 ?>
     <form id="form2" method="post">
         <label for="gender">Gênero:</label>
@@ -64,6 +68,8 @@ add_shortcode('form2', 'render_form2');
 function render_form3()
 {
     ob_start();
+    $form2_data = isset($_SESSION['form2_data']) ? $_SESSION['form2_data'] : [];
+    echo '<pre>' . var_dump($form2_data) . '</pre>';
 ?>
     <form id="form3" method="post">
         <label for="email">Endereço de Email:</label>
@@ -218,7 +224,7 @@ function script_form()
 }
 add_action('wp_footer', 'script_form');
 
-function return_acf_introduction_options($form_name = 'form1')
+function return_acf_introduction_options($form_id = 'form1')
 {
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
@@ -228,12 +234,12 @@ function return_acf_introduction_options($form_name = 'form1')
     <script type="text/javascript">
         jQuery(document).ready(function($) {
             console.log('Introduction Options Script Loaded');
-            var form1_data = JSON.parse(localStorage.getItem('Form1_data') || '{}');
-            var form2_data = JSON.parse(localStorage.getItem('Form2_data') || '{}');
-            var form3_data = JSON.parse(localStorage.getItem('Form3_data') || '{}');
+            var form1_data = JSON.parse(localStorage.getItem('form1_data') || '{}');
+            var form2_data = JSON.parse(localStorage.getItem('form2_data') || '{}');
+            var form3_data = JSON.parse(localStorage.getItem('form3_data') || '{}');
             var form_data = {};
 
-            switch ('<?= $form_name ?>') {
+            switch ('<?= $form_id ?>') {
                 case 'form1':
                     form_data = form1_data;
                     break;
@@ -245,13 +251,13 @@ function return_acf_introduction_options($form_name = 'form1')
                     break;
             }
 
-            localStorage.setItem('<?= $form_name ?>_final_data', JSON.stringify(form_data));
+            localStorage.setItem('<?= $form_id ?>_final_data', JSON.stringify(form_data));
             console.log('Form Data:', form_data);
 
             var audio_files = [];
             var subtitles = [];
 
-            <?php if ($form_name === 'form1') : ?>
+            <?php if ($form_id === 'form1') : ?>
                 <?php foreach ($intros as $option) : ?>
                     audio_files.push('<?= $option['audio_de_introducao_'] ?>');
                     var legenda_json = '<?= addslashes($option['legenda_de_introducao_']) ?>';
@@ -278,7 +284,7 @@ function return_acf_introduction_options($form_name = 'form1')
                         }
                     }
                 <?php endforeach; ?>
-            <?php elseif ($form_name === 'form2') : ?>
+            <?php elseif ($form_id === 'form2') : ?>
                 var gender = form_data['gender'];
                 var expression_number = form_data['expression_number'];
                 <?php foreach ($nums_expressao as $option) : ?>
@@ -295,7 +301,7 @@ function return_acf_introduction_options($form_name = 'form1')
                         }
                     }
                 <?php endforeach; ?>
-            <?php elseif ($form_name === 'form3') : ?>
+            <?php elseif ($form_id === 'form3') : ?>
                 var motivation_number = form_data['motivation_number'];
                 var relationship_status = form_data['marital_status'];
                 <?php foreach ($nums_motivacao as $option) : ?>
@@ -376,7 +382,7 @@ function return_acf_introduction_options($form_name = 'form1')
 function return_acf_introduction_options_shortcode($atts)
 {
     $atts = shortcode_atts(array(
-        'form' => 'Form1',
+        'form' => 'form1',
     ), $atts, 'return_players');
 
     ob_start();
@@ -392,7 +398,7 @@ function get_destiny_number()
     <script type="text/javascript">
         jQuery(document).ready(function($) {
             console.log('Destiny Number Script Loaded');
-            var form1_data = JSON.parse(localStorage.getItem('Form1_final_data') || '{}');
+            var form1_data = JSON.parse(localStorage.getItem('form1_final_data') || '{}');
             var destiny_number = form1_data['destiny_number'] || 'No destiny number found';
             $('.num_destino').text(destiny_number);
         });
@@ -426,4 +432,3 @@ function render_results()
     return ob_get_clean();
 }
 add_shortcode('resultados', 'render_results');
-
