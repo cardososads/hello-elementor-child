@@ -21,6 +21,10 @@ function start_session()
 }
 add_action('init', 'start_session', 1);
 
+require get_stylesheet_directory() . '/inc/class-acf-options.php';
+require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
+require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
+
 function render_form1()
 {
     ob_start();
@@ -422,3 +426,4 @@ function render_results()
     return ob_get_clean();
 }
 add_shortcode('resultados', 'render_results');
+
