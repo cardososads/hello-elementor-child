@@ -9,7 +9,7 @@ function hello_elementor_child_enqueue_styles()
     wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'));
 
     // Enfileirando o script customizado, que depende do jQuery e será carregado no footer
-    wp_enqueue_script('functions_js', get_stylesheet_directory_uri() . '/functions.js', array('jquery'), '1.0', true);
+    wp_enqueue_script('functions', get_stylesheet_directory_uri() . '/functions.js', array('jquery'), '1.0', true);
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
