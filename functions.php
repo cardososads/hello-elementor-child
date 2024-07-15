@@ -389,7 +389,7 @@ function process_forms()
             'destiny_number' => $destiny_number
         ];
         // Redirecionar para a próxima página do formulário
-        wp_redirect(home_url('/form2'));
+        wp_redirect(home_url('/form-02'));
         exit();
     }
 
@@ -407,7 +407,7 @@ function process_forms()
             'expression_number' => $expression_number
         ];
         // Redirecionar para a próxima página do formulário
-        wp_redirect(home_url('/form3'));
+        wp_redirect(home_url('/form-03'));
         exit();
     }
 
@@ -425,8 +425,32 @@ function process_forms()
             'motivation_number' => $motivation_number
         ];
         // Redirecionar para a página final ou de resultados
-        wp_redirect(home_url('/resultados'));
+        wp_redirect(home_url('/pagina-de-conversao'));
         exit();
     }
 }
 add_action('init', 'process_forms');
+
+function render_results()
+{
+    session_start();
+    $form1_data = isset($_SESSION['form1_data']) ? $_SESSION['form1_data'] : [];
+    $form2_data = isset($_SESSION['form2_data']) ? $_SESSION['form2_data'] : [];
+    $form3_data = isset($_SESSION['form3_data']) ? $_SESSION['form3_data'] : [];
+
+    ob_start();
+?>
+    <h2>Resultados</h2>
+    <p><strong>Primeiro Nome:</strong> <?php echo esc_html($form1_data['first_name']); ?></p>
+    <p><strong>Data de Nascimento:</strong> <?php echo esc_html($form1_data['birth_date']); ?></p>
+    <p><strong>Número de Destino:</strong> <?php echo esc_html($form1_data['destiny_number']); ?></p>
+    <p><strong>Gênero:</strong> <?php echo esc_html($form2_data['gender']); ?></p>
+    <p><strong>Nome Completo de Nascimento:</strong> <?php echo esc_html($form2_data['full_name']); ?></p>
+    <p><strong>Número de Expressão:</strong> <?php echo esc_html($form2_data['expression_number']); ?></p>
+    <p><strong>Email:</strong> <?php echo esc_html($form3_data['email']); ?></p>
+    <p><strong>Estado Civil:</strong> <?php echo esc_html($form3_data['marital_status']); ?></p>
+    <p><strong>Número de Motivação:</strong> <?php echo esc_html($form3_data['motivation_number']); ?></p>
+<?php
+    return ob_get_clean();
+}
+add_shortcode('resultados', 'render_results');
