@@ -31,7 +31,9 @@ function script_form()
 
             // Exibe painel_execucao com fade-in no carregamento da página
             if (painelExecucao) {
-                jQuery(painelExecucao).fadeIn(1000);
+                setTimeout(function() {
+                    jQuery(painelExecucao).fadeIn(1000);
+                }, 2000); // 2 segundos de atraso
             }
 
             // Função para verificar se todos os players terminaram
@@ -39,9 +41,13 @@ function script_form()
                 if (playersFinished === players.length) {
                     // Todos os players terminaram
                     if (painelExecucao && secForm2) {
-                        jQuery(painelExecucao).fadeOut(1000, function() {
-                            jQuery(secForm2).fadeIn(1000);
-                        });
+                        setTimeout(function() {
+                            jQuery(painelExecucao).fadeOut(1000, function() {
+                                setTimeout(function() {
+                                    jQuery(secForm2).fadeIn(1000);
+                                }, 2000); // 2 segundos de atraso após fade-out
+                            });
+                        }, 2000); // 2 segundos de atraso antes do fade-out
                     }
                 }
             }
@@ -55,6 +61,7 @@ function script_form()
             });
         });
     </script>
+
 
     <?php
 }
