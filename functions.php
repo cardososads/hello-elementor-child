@@ -48,7 +48,7 @@ function script_form()
     </script>
     <?php
 }
-add_action('wp_footer', 'script_form');
+add_action('wp_head', 'script_form');
 
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
