@@ -7,6 +7,12 @@ function hello_elementor_child_enqueue_styles()
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
+function enqueue_jquery()
+{
+    wp_enqueue_script('jquery');
+}
+add_action('wp_enqueue_scripts', 'enqueue_jquery');
+
 function start_session()
 {
     if (!session_id()) {
@@ -20,6 +26,7 @@ function script_form()
 ?>
     <script type="text/javascript">
         jQuery(document).ready(function($) {
+            console.log('Script Form Loaded');
             var painelExecucao = $('.painel_execucao');
             var secForm = $('.sec_form');
             var playersContainer = $('.players');
@@ -120,6 +127,7 @@ function process_elementor_form_submission($record, $handler)
 
     // Passe os dados do formulário para o JavaScript
     echo '<script type="text/javascript">
+        console.log("Form Submission: ' . $form_name . '", ' . json_encode($fields) . ');
         var formData = ' . json_encode($fields) . ';
         localStorage.setItem("' . $form_name . '_data", JSON.stringify(formData));
     </script>';
@@ -134,6 +142,7 @@ function return_acf_introduction_options($form_name = 'Form1')
 ?>
     <script type="text/javascript">
         jQuery(document).ready(function($) {
+            console.log('Introduction Options Script Loaded');
             var form1_data = JSON.parse(localStorage.getItem('Form1_data') || '{}');
             var form2_data = JSON.parse(localStorage.getItem('Form2_data') || '{}');
             var form3_data = JSON.parse(localStorage.getItem('Form3_data') || '{}');
@@ -152,6 +161,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             }
 
             localStorage.setItem('<?= $form_name ?>_final_data', JSON.stringify(form_data));
+            console.log('Form Data:', form_data);
 
             var audio_files = [];
             var subtitles = [];
@@ -296,6 +306,7 @@ function get_destiny_number()
 ?>
     <script type="text/javascript">
         jQuery(document).ready(function($) {
+            console.log('Destiny Number Script Loaded');
             var form1_data = JSON.parse(localStorage.getItem('Form1_final_data') || '{}');
             var destiny_number = form1_data['destiny_number'] || 'No destiny number found';
             $('.num_destino').text(destiny_number);
