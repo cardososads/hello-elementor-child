@@ -12,8 +12,8 @@ function script_form()
 ?>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
-            var painelExecucao = document.getElementById('painel_execucao');
-            var secForm2 = document.getElementById('sec_form_2');
+            var painelExecucao = document.getElementsByClassName('painel_execucao');
+            var secForm2 = document.getElementsByClassName('sec_form');
             var playersContainer = document.getElementById('players');
             var players = playersContainer ? playersContainer.querySelectorAll('audio') : [];
             var playersFinished = 0;
