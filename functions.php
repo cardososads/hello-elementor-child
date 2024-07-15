@@ -16,6 +16,7 @@ function script_form()
             var secForm = document.querySelector('.sec_form');
             var playersContainer = document.querySelector('.players');
             var numeroDestinoStyle = document.getElementById('numero_destino_style');
+            var sol = document.getElementById('sol');
             var players = playersContainer ? playersContainer.querySelectorAll('audio') : [];
             var playersFinished = 0;
 
@@ -23,10 +24,14 @@ function script_form()
             if (secForm) {
                 secForm.style.display = 'none';
             }
-            // Oculta numero_destino_style inicialmente
+            // Oculta numero_destino_style e sol inicialmente
             if (numeroDestinoStyle) {
                 numeroDestinoStyle.style.display = 'none';
                 numeroDestinoStyle.style.width = '0';
+            }
+            if (sol) {
+                sol.style.display = 'none';
+                sol.style.width = '50%'; // Largura inicial maior
             }
 
             // Exibe painel_execucao com fade-in no carregamento da página
@@ -66,6 +71,14 @@ function script_form()
                             setTimeout(function() {
                                 console.log('Adicionando classe show ao numeroDestinoStyle');
                                 numeroDestinoStyle.classList.add('show');
+                            }, 50); // Atraso de 50ms
+                        }
+                        if (sol) {
+                            sol.style.display = 'block';
+                            // Adiciona um pequeno atraso antes de adicionar a classe para garantir que a transição seja aplicada
+                            setTimeout(function() {
+                                console.log('Adicionando classe show ao sol');
+                                sol.classList.add('show');
                             }, 50); // Atraso de 50ms
                         }
                     });
@@ -303,7 +316,21 @@ function return_acf_introduction_options($form_name = 'Form1')
 
         #numero_destino_style.show {
             display: block;
-            width: 40%!important;
+            width: 40% !important;
+        }
+
+        #sol {
+            display: none;
+            /* Escondido inicialmente */
+            width: 50% !important;
+            /* Largura inicial maior */
+            transition: width 1s ease-in-out;
+            /* Transição suave para a largura */
+        }
+
+        #sol.show {
+            display: block;
+            width: 15% !important;
         }
     </style>
 <?php
