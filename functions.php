@@ -2,14 +2,14 @@
 
 function hello_elementor_child_enqueue_styles()
 {
-    // Enfileirando o estilo principal do tema pai
+    // Enfileira o estilo principal do tema pai
     wp_enqueue_style('hello-elementor-style', get_template_directory_uri() . '/style.css');
 
-    // Enfileirando o estilo do tema filho, que depende do estilo do tema pai
-    wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'));
+    // Enfileira o estilo do tema filho, que depende do estilo do tema pai
+    wp_enqueue_style('hello-elementor-child-style', get_stylesheet_directory_uri() . '/style.css', array('hello-elementor-style'), '1.0');
 
-    // Enfileirando o script customizado, que depende do jQuery e será carregado no footer
-    wp_enqueue_script('functions', get_stylesheet_directory_uri() . '/functions.js', array('jquery'), '1.0', true);
+    // Enfileira o script customizado, que depende do jQuery e será carregado no footer
+    wp_enqueue_script('functions_js', get_stylesheet_directory_uri() . '/functions.js', array('jquery'), '1.0', true);
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
