@@ -28,8 +28,6 @@ add_action('init', 'start_session', 1);
 function render_form1()
 {
     ob_start();
-    $form1_data = isset($_SESSION['form1_data']) ? $_SESSION['form1_data'] : [];
-    echo '<pre>' . var_dump($form1_data) . '</pre>';
 ?>
     <form id="form1" method="post">
         <label for="first_name">Primeiro Nome:</label>
@@ -68,8 +66,9 @@ add_shortcode('form2', 'render_form2');
 function render_form3()
 {
     ob_start();
+    $form1_data = isset($_SESSION['form1_data']) ? $_SESSION['form1_data'] : [];
     $form2_data = isset($_SESSION['form2_data']) ? $_SESSION['form2_data'] : [];
-    echo '<pre>' . var_dump($form2_data) . '</pre>';
+    echo '<pre>' . var_dump($form1_data, $form2_data) . '</pre>';
 ?>
     <form id="form3" method="post">
         <label for="email">Endereço de Email:</label>
@@ -258,9 +257,7 @@ function return_acf_introduction_options($form_id = 'form1')
             var subtitles = [];
 
             <?php if ($form_id === 'form1') : ?>
-                <?php foreach ($intros as $option) : 
-                        var_dump($intros);
-                    ?>
+                <?php foreach ($intros as $option) : ?>
                     audio_files.push('<?= $option['audio_de_introducao_'] ?>');
                     var legenda_json = '<?= addslashes($option['legenda_de_introducao_']) ?>';
                     legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
@@ -434,3 +431,4 @@ function render_results()
     return ob_get_clean();
 }
 add_shortcode('resultados', 'render_results');
+
