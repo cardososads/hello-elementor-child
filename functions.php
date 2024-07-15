@@ -23,9 +23,14 @@ function script_form()
             var playersContainer = document.getElementById('players');
             var players = playersContainer.querySelectorAll('audio');
             var playersFinished = 0;
-            console.log(players)
-            // Oculta o painel_execucao inicialmente
-            painelExecucao.style.display = 'none';
+
+            // Oculta o painel_execucao e o sec_form_2 inicialmente
+            if (painelExecucao) {
+                painelExecucao.style.display = 'none';
+            }
+            if (secForm2) {
+                secForm2.style.display = 'none';
+            }
 
             // Função para verificar se todos os players terminaram
             function checkPlayers() {
@@ -44,12 +49,16 @@ function script_form()
                     checkPlayers();
                 });
             });
+
+            // Exibir secForm2 ao carregar a página
+            if (secForm2) {
+                jQuery(secForm2).fadeIn(1000);
+            }
         });
     </script>
     <?php
 }
-add_action('wp_head', 'script_form');
-
+add_action('wp_footer', 'script_form');
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
 require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
