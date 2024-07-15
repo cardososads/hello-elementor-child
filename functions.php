@@ -340,3 +340,22 @@ function return_acf_introduction_options_shortcode($atts)
 }
 
 add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
+
+function get_destiny_number()
+{
+    $form1_data = get_transient('formForm1_submission_data');
+    if ($form1_data && isset($form1_data['birth_date'])) {
+        $calculator = new NumerologyCalculator();
+        $destiny_number = $calculator->calculateDestinyNumber($form1_data['birth_date']);
+        return $destiny_number;
+    }
+    return 'No destiny number found';
+}
+
+function return_destiny_number_shortcode()
+{
+    $destiny_number = get_destiny_number();
+    return $destiny_number;
+}
+
+add_shortcode('destiny_number', 'return_destiny_number_shortcode');
