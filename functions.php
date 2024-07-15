@@ -26,7 +26,7 @@ function script_form()
 
             // Oculta o painel_execucao e o sec_form_2 inicialmente
             if (painelExecucao) {
-                painelExecucao.style.display = 'none';
+                painelExecucao.style.display = 'true';
             }
             if (secForm2) {
                 secForm2.style.display = 'none';
