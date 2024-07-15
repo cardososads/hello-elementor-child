@@ -13,14 +13,14 @@ function script_form()
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
             var painelExecucao = document.querySelector('.painel_execucao');
-            var secForm2 = document.querySelector('.sec_form');
-            var playersContainer = document.getElementById('players');
+            var secForm = document.querySelector('.sec_form');
+            var playersContainer = document.querySelector('.players');
             var players = playersContainer ? playersContainer.querySelectorAll('audio') : [];
             var playersFinished = 0;
 
-            // Oculta sec_form_2 inicialmente
-            if (secForm2) {
-                secForm2.style.display = 'none';
+            // Oculta sec_form inicialmente
+            if (secForm) {
+                secForm.style.display = 'none';
             }
 
             // Exibe painel_execucao com fade-in no carregamento da página
@@ -34,14 +34,14 @@ function script_form()
             function checkPlayers() {
                 if (playersFinished === players.length) {
                     // Todos os players terminaram
-                    if (painelExecucao && secForm2) {
+                    if (painelExecucao && secForm) {
                         setTimeout(function() {
                             jQuery(painelExecucao).fadeOut(1000, function() {
                                 setTimeout(function() {
-                                    jQuery(secForm2).fadeIn(1000);
-                                }, 1000); // 1 segundos de atraso após fade-out
+                                    jQuery(secForm).fadeIn(1000);
+                                }, 1000); // 1 segundo de atraso após fade-out
                             });
-                        }, 1000); // 1 segundos de atraso antes do fade-out
+                        }, 1000); // 1 segundo de atraso antes do fade-out
                     }
                 }
             }
