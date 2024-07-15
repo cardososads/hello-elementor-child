@@ -218,7 +218,7 @@ function script_form()
 }
 add_action('wp_footer', 'script_form');
 
-function return_acf_introduction_options($form_name = 'Form1')
+function return_acf_introduction_options($form_name = 'form1')
 {
     $intros = ACFOptions::get_field('acf_intoducoes');
     $nums_destino = ACFOptions::get_field('acf_numeros_de_destino');
@@ -234,13 +234,13 @@ function return_acf_introduction_options($form_name = 'Form1')
             var form_data = {};
 
             switch ('<?= $form_name ?>') {
-                case 'Form1':
+                case 'form1':
                     form_data = form1_data;
                     break;
-                case 'Form2':
+                case 'form2':
                     form_data = $.extend({}, form1_data, form2_data);
                     break;
-                case 'Form3':
+                case 'form3':
                     form_data = $.extend({}, form1_data, form2_data, form3_data);
                     break;
             }
@@ -251,7 +251,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             var audio_files = [];
             var subtitles = [];
 
-            <?php if ($form_name === 'Form1') : ?>
+            <?php if ($form_name === 'form1') : ?>
                 <?php foreach ($intros as $option) : ?>
                     audio_files.push('<?= $option['audio_de_introducao_'] ?>');
                     var legenda_json = '<?= addslashes($option['legenda_de_introducao_']) ?>';
@@ -278,7 +278,7 @@ function return_acf_introduction_options($form_name = 'Form1')
                         }
                     }
                 <?php endforeach; ?>
-            <?php elseif ($form_name === 'Form2') : ?>
+            <?php elseif ($form_name === 'form2') : ?>
                 var gender = form_data['gender'];
                 var expression_number = form_data['expression_number'];
                 <?php foreach ($nums_expressao as $option) : ?>
@@ -295,7 +295,7 @@ function return_acf_introduction_options($form_name = 'Form1')
                         }
                     }
                 <?php endforeach; ?>
-            <?php elseif ($form_name === 'Form3') : ?>
+            <?php elseif ($form_name === 'form3') : ?>
                 var motivation_number = form_data['motivation_number'];
                 var relationship_status = form_data['marital_status'];
                 <?php foreach ($nums_motivacao as $option) : ?>
