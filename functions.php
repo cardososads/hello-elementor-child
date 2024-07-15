@@ -21,6 +21,121 @@ function start_session()
 }
 add_action('init', 'start_session', 1);
 
+function render_form1()
+{
+    ob_start();
+?>
+    <form id="form1" method="post">
+        <label for="first_name">Primeiro Nome:</label>
+        <input type="text" id="first_name" name="first_name" required>
+        <label for="birth_date">Data de Nascimento:</label>
+        <input type="date" id="birth_date" name="birth_date" required>
+        <input type="submit" name="submit_form1" value="Enviar">
+    </form>
+<?php
+    return ob_get_clean();
+}
+add_shortcode('form1', 'render_form1');
+
+function render_form2()
+{
+    ob_start();
+?>
+    <form id="form2" method="post">
+        <label for="gender">Gênero:</label>
+        <select id="gender" name="gender" required>
+            <option value="male">Masculino</option>
+            <option value="female">Feminino</option>
+            <option value="other">Outro</option>
+        </select>
+        <label for="full_name">Nome Completo de Nascimento:</label>
+        <input type="text" id="full_name" name="full_name" required>
+        <input type="submit" name="submit_form2" value="Enviar">
+    </form>
+<?php
+    return ob_get_clean();
+}
+add_shortcode('form2', 'render_form2');
+
+function render_form3()
+{
+    ob_start();
+?>
+    <form id="form3" method="post">
+        <label for="email">Endereço de Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="marital_status">Estado Civil:</label>
+        <select id="marital_status" name="marital_status" required>
+            <option value="single">Solteiro(a)</option>
+            <option value="married">Casado(a)</option>
+            <option value="divorced">Divorciado(a)</option>
+            <option value="widowed">Viúvo(a)</option>
+        </select>
+        <input type="submit" name="submit_form3" value="Enviar">
+    </form>
+<?php
+    return ob_get_clean();
+}
+add_shortcode('form3', 'render_form3');
+
+function process_forms()
+{
+    if (isset($_POST['submit_form1'])) {
+        $first_name = sanitize_text_field($_POST['first_name']);
+        $birth_date = sanitize_text_field($_POST['birth_date']);
+        // Calcular o número de destino
+        $calculator = new NumerologyCalculator();
+        $destiny_number = $calculator->calculateDestinyNumber($birth_date);
+        // Armazenar os dados na sessão
+        session_start();
+        $_SESSION['form1_data'] = [
+            'first_name' => $first_name,
+            'birth_date' => $birth_date,
+            'destiny_number' => $destiny_number
+        ];
+        // Redirecionar para a próxima página do formulário
+        wp_redirect(home_url('/form2'));
+        exit();
+    }
+
+    if (isset($_POST['submit_form2'])) {
+        $gender = sanitize_text_field($_POST['gender']);
+        $full_name = sanitize_text_field($_POST['full_name']);
+        // Calcular o número de expressão
+        $calculator = new NumerologyCalculator();
+        $expression_number = $calculator->calculateExpressionNumber($full_name);
+        // Armazenar os dados na sessão
+        session_start();
+        $_SESSION['form2_data'] = [
+            'gender' => $gender,
+            'full_name' => $full_name,
+            'expression_number' => $expression_number
+        ];
+        // Redirecionar para a próxima página do formulário
+        wp_redirect(home_url('/form3'));
+        exit();
+    }
+
+    if (isset($_POST['submit_form3'])) {
+        $email = sanitize_email($_POST['email']);
+        $marital_status = sanitize_text_field($_POST['marital_status']);
+        // Calcular o número de motivação
+        $calculator = new NumerologyCalculator();
+        $motivation_number = $calculator->calculateMotivationNumber($_SESSION['form2_data']['full_name']);
+        // Armazenar os dados na sessão
+        session_start();
+        $_SESSION['form3_data'] = [
+            'email' => $email,
+            'marital_status' => $marital_status,
+            'motivation_number' => $motivation_number
+        ];
+        // Redirecionar para a página final ou de resultados
+        wp_redirect(home_url('/resultados'));
+        exit();
+    }
+}
+add_action('init', 'process_forms');
+
 function script_form()
 {
 ?>
@@ -98,37 +213,6 @@ function script_form()
 <?php
 }
 add_action('wp_footer', 'script_form');
-
-require get_stylesheet_directory() . '/inc/class-acf-options.php';
-require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
-require get_stylesheet_directory() . '/inc/class-numerology-calculator.php';
-
-add_action('elementor_pro/forms/new_record', 'process_elementor_form_submission', 10, 2);
-
-function process_elementor_form_submission($record, $handler)
-{
-    header('Content-Type: application/json; charset=utf-8');
-
-    $form_name = $record->get_form_settings('form_name');
-    $fields = array_map(function ($field) {
-        return $field['value'];
-    }, $record->get('fields'));
-    $calculator = new NumerologyCalculator();
-
-    switch ($form_name) {
-        case 'Form1':
-            $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
-            break;
-        case 'Form2':
-            $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
-            break;
-        case 'Form3':
-            $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
-            break;
-    }
-
-    echo json_encode($fields, JSON_UNESCAPED_UNICODE);
-}
 
 function return_acf_introduction_options($form_name = 'Form1')
 {
@@ -314,122 +398,6 @@ function get_destiny_number()
 }
 
 add_shortcode('destiny_number', 'get_destiny_number');
-
-
-function render_form1()
-{
-    ob_start();
-?>
-    <form id="form1" method="post">
-        <label for="first_name">Primeiro Nome:</label>
-        <input type="text" id="first_name" name="first_name" required>
-        <label for="birth_date">Data de Nascimento:</label>
-        <input type="date" id="birth_date" name="birth_date" required>
-        <input type="submit" name="submit_form1" value="Enviar">
-    </form>
-<?php
-    return ob_get_clean();
-}
-add_shortcode('form1', 'render_form1');
-
-function render_form2()
-{
-    ob_start();
-?>
-    <form id="form2" method="post">
-        <label for="gender">Gênero:</label>
-        <select id="gender" name="gender" required>
-            <option value="male">Masculino</option>
-            <option value="female">Feminino</option>
-            <option value="other">Outro</option>
-        </select>
-        <label for="full_name">Nome Completo de Nascimento:</label>
-        <input type="text" id="full_name" name="full_name" required>
-        <input type="submit" name="submit_form2" value="Enviar">
-    </form>
-<?php
-    return ob_get_clean();
-}
-add_shortcode('form2', 'render_form2');
-
-function render_form3()
-{
-    ob_start();
-?>
-    <form id="form3" method="post">
-        <label for="email">Endereço de Email:</label>
-        <input type="email" id="email" name="email" required>
-        <label for="marital_status">Estado Civil:</label>
-        <select id="marital_status" name="marital_status" required>
-            <option value="single">Solteiro(a)</option>
-            <option value="married">Casado(a)</option>
-            <option value="divorced">Divorciado(a)</option>
-            <option value="widowed">Viúvo(a)</option>
-        </select>
-        <input type="submit" name="submit_form3" value="Enviar">
-    </form>
-<?php
-    return ob_get_clean();
-}
-add_shortcode('form3', 'render_form3');
-
-function process_forms()
-{
-    if (isset($_POST['submit_form1'])) {
-        $first_name = sanitize_text_field($_POST['first_name']);
-        $birth_date = sanitize_text_field($_POST['birth_date']);
-        // Calcular o número de destino
-        $calculator = new NumerologyCalculator();
-        $destiny_number = $calculator->calculateDestinyNumber($birth_date);
-        // Armazenar os dados na sessão
-        session_start();
-        $_SESSION['form1_data'] = [
-            'first_name' => $first_name,
-            'birth_date' => $birth_date,
-            'destiny_number' => $destiny_number
-        ];
-        // Redirecionar para a próxima página do formulário
-        wp_redirect(home_url('/form-02'));
-        exit();
-    }
-
-    if (isset($_POST['submit_form2'])) {
-        $gender = sanitize_text_field($_POST['gender']);
-        $full_name = sanitize_text_field($_POST['full_name']);
-        // Calcular o número de expressão
-        $calculator = new NumerologyCalculator();
-        $expression_number = $calculator->calculateExpressionNumber($full_name);
-        // Armazenar os dados na sessão
-        session_start();
-        $_SESSION['form2_data'] = [
-            'gender' => $gender,
-            'full_name' => $full_name,
-            'expression_number' => $expression_number
-        ];
-        // Redirecionar para a próxima página do formulário
-        wp_redirect(home_url('/form-03'));
-        exit();
-    }
-
-    if (isset($_POST['submit_form3'])) {
-        $email = sanitize_email($_POST['email']);
-        $marital_status = sanitize_text_field($_POST['marital_status']);
-        // Calcular o número de motivação
-        $calculator = new NumerologyCalculator();
-        $motivation_number = $calculator->calculateMotivationNumber($_SESSION['form2_data']['full_name']);
-        // Armazenar os dados na sessão
-        session_start();
-        $_SESSION['form3_data'] = [
-            'email' => $email,
-            'marital_status' => $marital_status,
-            'motivation_number' => $motivation_number
-        ];
-        // Redirecionar para a página final ou de resultados
-        wp_redirect(home_url('/pagina-de-conversao'));
-        exit();
-    }
-}
-add_action('init', 'process_forms');
 
 function render_results()
 {
