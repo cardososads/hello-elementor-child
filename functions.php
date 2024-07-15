@@ -258,7 +258,9 @@ function return_acf_introduction_options($form_id = 'form1')
             var subtitles = [];
 
             <?php if ($form_id === 'form1') : ?>
-                <?php foreach ($intros as $option) : ?>
+                <?php foreach ($intros as $option) : 
+                        var_dump($intros);
+                    ?>
                     audio_files.push('<?= $option['audio_de_introducao_'] ?>');
                     var legenda_json = '<?= addslashes($option['legenda_de_introducao_']) ?>';
                     legenda_json = legenda_json.replace(/(\w+):/g, '"$1":');
