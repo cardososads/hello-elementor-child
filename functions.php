@@ -359,7 +359,7 @@ function get_destiny_number()
 function return_destiny_number_shortcode()
 {
     $destiny_number = get_destiny_number();
-    return $destiny_number;
+    echo '<p class="num_destino">' . $destiny_number . '</p>';
 }
 
 add_shortcode('destiny_number', 'return_destiny_number_shortcode');
