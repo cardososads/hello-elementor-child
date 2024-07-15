@@ -36,8 +36,9 @@ function script_form()
             function checkPlayers() {
                 if (playersFinished === players.length) {
                     // Todos os players terminaram
-                    jQuery(painelExecucao).fadeIn(1000);
-                    jQuery(secForm2).fadeIn(1000);
+                    jQuery(painelExecucao).fadeOut(1000, function() {
+                        jQuery(secForm2).fadeIn(1000);
+                    });
                 }
             }
 
@@ -53,6 +54,7 @@ function script_form()
     <?php
 }
 add_action('wp_footer', 'script_form');
+
 
 require get_stylesheet_directory() . '/inc/class-acf-options.php';
 require get_stylesheet_directory() . '/inc/class-form-data-retriever.php';
