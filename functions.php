@@ -231,7 +231,7 @@ function return_acf_introduction_options($form_name = 'Form1')
 
     foreach ($audio_files as $index => $audio_src) {
     ?>
-        <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" controls <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
+        <audio id="audio_player_<?= $index ?>" src="<?= $audio_src ?>" <?= $index > 0 ? 'style="display:none;"' : '' ?>></audio>
         <div id="legenda_<?= $index ?>" class="legenda" style="display: none;"></div>
     <?php
     }
