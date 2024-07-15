@@ -7,6 +7,14 @@ function hello_elementor_child_enqueue_styles()
 }
 add_action('wp_enqueue_scripts', 'hello_elementor_child_enqueue_styles');
 
+function start_session()
+{
+    if (!session_id()) {
+        session_start();
+    }
+}
+add_action('init', 'start_session', 1);
+
 function script_form()
 {
 ?>
@@ -102,36 +110,37 @@ function process_elementor_form_submission($record, $handler)
     switch ($form_name) {
         case 'Form1':
             $fields['destiny_number'] = $calculator->calculateDestinyNumber($fields['birth_date']);
+            $_SESSION['formForm1_submission_data'] = $fields;
             break;
         case 'Form2':
             $fields['expression_number'] = $calculator->calculateExpressionNumber($fields['full_name']);
-            $form1_data = get_transient('formForm1_submission_data');
+            $form1_data = isset($_SESSION['formForm1_submission_data']) ? $_SESSION['formForm1_submission_data'] : [];
             if ($form1_data) {
                 $fields = array_merge($form1_data, $fields);
             }
+            $_SESSION['formForm2_submission_data'] = $fields;
             break;
         case 'Form3':
             $fields['motivation_number'] = $calculator->calculateMotivationNumber($fields['full_name']);
-            $form1_data = get_transient('formForm1_submission_data');
-            $form2_data = get_transient('formForm2_submission_data');
+            $form1_data = isset($_SESSION['formForm1_submission_data']) ? $_SESSION['formForm1_submission_data'] : [];
+            $form2_data = isset($_SESSION['formForm2_submission_data']) ? $_SESSION['formForm2_submission_data'] : [];
             if ($form1_data) {
                 $fields = array_merge($form1_data, $fields);
             }
             if ($form2_data) {
                 $fields = array_merge($form2_data, $fields);
             }
+            $_SESSION['formForm3_submission_data'] = $fields;
             break;
     }
-
-    set_transient("form{$form_name}_submission_data", $fields, HOUR_IN_SECONDS);
 }
 
 function forms_data($form)
 {
     if (in_array($form, ['Form1', 'Form2', 'Form3'])) {
-        $form1_data = get_transient('formForm1_submission_data');
-        $form2_data = get_transient('formForm2_submission_data');
-        $form_data = get_transient('form' . $form . '_submission_data');
+        $form1_data = isset($_SESSION['formForm1_submission_data']) ? $_SESSION['formForm1_submission_data'] : [];
+        $form2_data = isset($_SESSION['formForm2_submission_data']) ? $_SESSION['formForm2_submission_data'] : [];
+        $form_data = isset($_SESSION['form' . $form . '_submission_data']) ? $_SESSION['form' . $form . '_submission_data'] : [];
 
         if ($form === 'Form2' && $form1_data) {
             $form_data = array_merge($form1_data, $form_data);
@@ -301,7 +310,7 @@ function return_acf_introduction_options($form_name = 'Form1')
             text-align: center;
         }
 
-        .num_dest{
+        .num_dest {
             color: white;
         }
 
@@ -314,7 +323,7 @@ function return_acf_introduction_options($form_name = 'Form1')
         }
 
         #numero_destino_style.show {
-            display: flex!important;
+            display: flex !important;
             width: 40% !important;
         }
 
@@ -347,7 +356,7 @@ add_shortcode('return_players', 'return_acf_introduction_options_shortcode');
 
 function get_destiny_number()
 {
-    $form1_data = get_transient('formForm1_submission_data');
+    $form1_data = isset($_SESSION['formForm1_submission_data']) ? $_SESSION['formForm1_submission_data'] : [];
     if ($form1_data && isset($form1_data['birth_date'])) {
         $calculator = new NumerologyCalculator();
         $destiny_number = $calculator->calculateDestinyNumber($form1_data['birth_date']);
@@ -363,3 +372,10 @@ function return_destiny_number_shortcode()
 }
 
 add_shortcode('destiny_number', 'return_destiny_number_shortcode');
+
+function end_session()
+{
+    session_destroy();
+}
+add_action('wp_logout', 'end_session');
+add_action('wp_login', 'end_session');
