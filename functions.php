@@ -17,6 +17,7 @@ function script_form()
 {
 ?>
     <script type="text/javascript">
+        console.log("Aqui!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         document.addEventListener('DOMContentLoaded', function() {
             var painelExecucao = document.getElementById('painel_execucao');
             var secForm2 = document.getElementById('sec_form_2');
